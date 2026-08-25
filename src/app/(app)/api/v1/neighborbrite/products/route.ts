@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
           equals: 'published',
         },
       },
-      limit: 1000,
+      limit: 100,
     })
 
     // 3. Map Payload documents to Neighborbrite JSON schema
@@ -45,18 +45,19 @@ export async function GET(req: NextRequest) {
       const images = (doc.gallery || [])
         .map((item: any) => {
           const mediaObj = typeof item.image === 'object' ? item.image : null
+          console.log('image object:', mediaObj)
           if (!mediaObj?.url) return null
           return mediaObj.url.startsWith('http') ? mediaObj.url : `${baseUrl}${mediaObj.url}`
         })
         .filter(Boolean)
 
       // Extract category title or slug
-      const categoryName =
-        typeof doc.category_ref === 'object' && doc.category_ref?.title
-          ? typeof doc.category_ref.title === 'object'
-            ? doc.category_ref.title.de || doc.category_ref.title.en
-            : doc.category_ref.title
-          : 'perennials'
+      // const categoryName =
+      //   typeof doc.category_ref === 'object' && doc.category_ref?.title
+      //     ? typeof doc.category_ref.title === 'object'
+      //       ? doc.category_ref.title.de || doc.category_ref.title.en
+      //       : doc.category_ref.title
+      //     : 'perennials'
 
       const attrs = doc.attributes || {}
 
@@ -69,7 +70,7 @@ export async function GET(req: NextRequest) {
         cultivar: doc.cultivar || '',
         names: doc.common_name || {}, // Payload localized object: { "de": "...", "en": "..." }
         descriptions: doc.description || {}, // Payload localized object: { "de": "...", "en": "..." }
-        category: categoryName.toLowerCase(),
+        category: doc.category || '',
         indoor_outdoor: doc.indoor_outdoor || 'outdoor',
         images: images,
         attributes: {

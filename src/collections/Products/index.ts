@@ -1,7 +1,3 @@
-import { CallToAction } from '@/blocks/CallToAction/config'
-import { Content } from '@/blocks/Content/config'
-import { MediaBlock } from '@/blocks/MediaBlock/config'
-import { slugField } from 'payload'
 import { generatePreviewPath } from '@/utilities/generatePreviewPath'
 import { CollectionOverride } from '@payloadcms/plugin-ecommerce/types'
 import {
@@ -11,20 +7,13 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
-import {
-  FixedToolbarFeature,
-  HeadingFeature,
-  HorizontalRuleFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
-import { DefaultDocumentIDType, Where } from 'payload'
+import { slugField } from 'payload'
 
 export const ProductsCollection: CollectionOverride = ({ defaultCollection }) => ({
   ...defaultCollection,
   admin: {
     ...defaultCollection?.admin,
-    defaultColumns: ['title', 'enableVariants', '_status', 'variants.variants'],
+    defaultColumns: ['title', 'botanical_name', '_status'],
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({
@@ -45,42 +34,83 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     ...defaultCollection?.defaultPopulate,
     title: true,
     slug: true,
-    variantOptions: true,
-    variants: true,
-    enableVariants: true,
+    sku: true,
+    botanical_name: true,
     gallery: true,
-    priceInUSD: true,
-    inventory: true,
     meta: true,
   },
   fields: [
-    { name: 'title', type: 'text', required: true },
+    // Common / Title Field
+    {
+      name: 'title',
+      type: 'text',
+      required: true,
+      label: 'Title',
+    },
+    {
+      name: 'status',
+      type: 'select',
+      defaultValue: 'active',
+      options: [
+        { label: 'Active', value: 'active' },
+        { label: 'Archived', value: 'archived' },
+      ],
+      admin: { width: '50%' },
+    },
+
+    {
+      name: 'common_name',
+      type: 'text',
+      required: true,
+      localized: true,
+      label: 'Plant Common Name',
+      admin: {
+        description: 'Localized plant name mapping directly to Neighborbrite "names" field.',
+      },
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'sku',
+          type: 'text',
+          required: true,
+          label: 'Master SKU (e.g., SP-SALV-CARA-C2)',
+          admin: { width: '50%' },
+        },
+        {
+          name: 'category',
+          type: 'select',
+          defaultValue: 'perennials',
+          options: [
+            { label: 'Perennials', value: 'perennials' },
+            { label: 'Grasses', value: 'grasses' },
+          ],
+          admin: { width: '50%' },
+        },
+      ],
+    },
+
     {
       type: 'tabs',
       tabs: [
+        // ==========================================
+        // TAB 1: CONTENT & MEDIA
+        // ==========================================
         {
+          label: 'Content & Media',
           fields: [
             {
               name: 'description',
-              type: 'richText',
-              editor: lexicalEditor({
-                features: ({ rootFeatures }) => {
-                  return [
-                    ...rootFeatures,
-                    HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                    FixedToolbarFeature(),
-                    InlineToolbarFeature(),
-                    HorizontalRuleFeature(),
-                  ]
-                },
-              }),
-              label: false,
-              required: false,
+              type: 'textarea',
+              localized: true,
+              label: 'Description',
             },
             {
               name: 'gallery',
               type: 'array',
               minRows: 1,
+              label: 'Plant Images',
               fields: [
                 {
                   name: 'image',
@@ -88,86 +118,290 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
                   relationTo: 'media',
                   required: true,
                 },
+              ],
+            },
+          ],
+        },
+
+        // ==========================================
+        // TAB 2: BOTANICAL ATTRIBUTES (Neighborbrite API)
+        // ==========================================
+        {
+          label: 'Botanical Attributes',
+          fields: [
+            {
+              type: 'row',
+              fields: [
                 {
-                  name: 'variantOption',
-                  type: 'relationship',
-                  relationTo: 'variantOptions',
-                  admin: {
-                    condition: (data) => {
-                      return data?.enableVariants === true && data?.variantTypes?.length > 0
-                    },
-                  },
-                  filterOptions: ({ data }) => {
-                    if (data?.enableVariants && data?.variantTypes?.length) {
-                      const variantTypeIDs = data.variantTypes.map((item: any) => {
-                        if (typeof item === 'object' && item?.id) {
-                          return item.id
-                        }
-                        return item
-                      }) as DefaultDocumentIDType[]
-
-                      if (variantTypeIDs.length === 0)
-                        return {
-                          variantType: {
-                            in: [],
-                          },
-                        }
-
-                      const query: Where = {
-                        variantType: {
-                          in: variantTypeIDs,
-                        },
-                      }
-
-                      return query
-                    }
-
-                    return {
-                      variantType: {
-                        in: [],
-                      },
-                    }
-                  },
+                  name: 'botanical_name',
+                  type: 'text',
+                  required: true,
+                  label: 'Botanical Name (e.g., Salvia nemorosa)',
+                  admin: { width: '50%' },
+                },
+                {
+                  name: 'cultivar',
+                  type: 'text',
+                  label: 'Cultivar (e.g., Caradonna)',
+                  admin: { width: '50%' },
+                },
+              ],
+            },
+            {
+              name: 'botanical_name_full',
+              type: 'text',
+              label: "Full Botanical Name (e.g., Salvia nemorosa 'Caradonna')",
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'indoor_outdoor',
+                  type: 'select',
+                  defaultValue: 'outdoor',
+                  label: 'Indoor / Outdoor',
+                  options: [
+                    { label: 'Outdoor', value: 'outdoor' },
+                    { label: 'Indoor', value: 'indoor' },
+                    { label: 'Both', value: 'both' },
+                  ],
+                  admin: { width: '50%' },
+                },
+                {
+                  name: 'style_tags',
+                  type: 'select',
+                  hasMany: true,
+                  options: [
+                    { label: 'Pollinator Garden', value: 'pollinator-garden' },
+                    { label: 'Cottage Garden', value: 'cottage-garden' },
+                    { label: 'Modern Minimalist', value: 'modern-minimalist' },
+                    { label: 'Prairie Garden', value: 'prairie-garden' },
+                  ],
+                  admin: { width: '50%' },
                 },
               ],
             },
 
+            // Group: Neighborbrite "attributes" Object
             {
-              name: 'layout',
-              type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock],
+              type: 'group',
+              name: 'attributes',
+              label: 'Plant Trait Attributes',
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'hardiness_zone_min',
+                      type: 'text',
+                      label: 'Hardiness Zone Min',
+                      admin: { width: '33%', placeholder: '5' },
+                    },
+                    {
+                      name: 'foliage_type',
+                      type: 'select',
+                      options: [
+                        { label: 'Deciduous', value: 'deciduous' },
+                        { label: 'Evergreen', value: 'evergreen' },
+                        { label: 'Semi-Evergreen', value: 'semi_evergreen' },
+                      ],
+                      admin: { width: '33%' },
+                    },
+                    {
+                      name: 'water_requirements',
+                      type: 'select',
+                      options: [
+                        { label: 'Low', value: 'low' },
+                        { label: 'Medium', value: 'medium' },
+                        { label: 'High', value: 'high' },
+                      ],
+                      admin: { width: '33%' },
+                    },
+                  ],
+                },
+
+                // Height & Width Ranges
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'mature_height_min_cm',
+                      type: 'number',
+                      label: 'Mature Height Min (cm)',
+                      admin: { width: '25%' },
+                    },
+                    {
+                      name: 'mature_height_max_cm',
+                      type: 'number',
+                      label: 'Mature Height Max (cm)',
+                      admin: { width: '25%' },
+                    },
+                    {
+                      name: 'mature_width_min_cm',
+                      type: 'number',
+                      label: 'Mature Width Min (cm)',
+                      admin: { width: '25%' },
+                    },
+                    {
+                      name: 'mature_width_max_cm',
+                      type: 'number',
+                      label: 'Mature Width Max (cm)',
+                      admin: { width: '25%' },
+                    },
+                  ],
+                },
+
+                // Environmental & Biological Characteristics
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'sunlight',
+                      type: 'select',
+                      hasMany: true,
+                      options: [
+                        { label: 'Full Sun', value: 'full_sun' },
+                        { label: 'Partial Sun', value: 'partial_sun' },
+                        { label: 'Full Shade', value: 'shade' },
+                      ],
+                      admin: { width: '50%' },
+                    },
+                    {
+                      name: 'bloom_season',
+                      type: 'select',
+                      hasMany: true,
+                      options: [
+                        { label: 'Spring', value: 'spring' },
+                        { label: 'Summer', value: 'summer' },
+                        { label: 'Fall', value: 'fall' },
+                        { label: 'Winter', value: 'winter' },
+                        { label: 'April', value: 'april' },
+                        { label: 'May', value: 'may' },
+                        { label: 'June', value: 'june' },
+                        { label: 'July', value: 'july' },
+                        { label: 'August', value: 'august' },
+                        { label: 'September', value: 'september' },
+                        { label: 'October', value: 'october' },
+                      ],
+                      admin: { width: '50%' },
+                    },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'flower_color',
+                      type: 'select',
+                      hasMany: true,
+                      options: [
+                        { label: 'Orange', value: 'orange' },
+                        { label: 'Yellow', value: 'yellow' },
+                        { label: 'Red', value: 'red' },
+                        { label: 'Blue', value: 'blue' },
+                        { label: 'Pink', value: 'pink' },
+                        { label: 'Yellow-Green', value: 'yellow-green' },
+                        { label: 'Magenta', value: 'magenta' },
+                        { label: 'Violet', value: 'violet' },
+                        { label: 'Lilac', value: 'lilac' },
+                        { label: 'Purple', value: 'purple' },
+                        { label: 'White', value: 'white' },
+                        { label: 'Silver', value: 'silver' },
+                        { label: 'Gold', value: 'gold' },
+                        { label: 'Bronze', value: 'bronze' },
+                        { label: 'Brown', value: 'brown' },
+                        { label: 'Green', value: 'green' },
+                      ],
+                      admin: { width: '50%' },
+                    },
+                    {
+                      name: 'pollinator_friendly',
+                      type: 'select',
+                      hasMany: true,
+                      options: [
+                        { label: 'Bees', value: 'bees' },
+                        { label: 'Butterflies', value: 'butterflies' },
+                        { label: 'Hummingbirds', value: 'hummingbirds' },
+                      ],
+                      admin: { width: '50%' },
+                    },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'pet_safe',
+                      type: 'select',
+                      defaultValue: 'unknown',
+                      options: [
+                        { label: 'Yes', value: 'safe' },
+                        { label: 'No', value: 'toxic' },
+                        { label: 'Unknown', value: 'unknown' },
+                      ],
+                      admin: { width: '33%' },
+                    },
+                    {
+                      name: 'drought_tolerant',
+                      type: 'checkbox',
+                      label: 'Drought Tolerant',
+                      defaultValue: false,
+                      admin: { width: '33%' },
+                    },
+                    {
+                      name: 'deer_resistant',
+                      type: 'checkbox',
+                      label: 'Deer Resistant',
+                      defaultValue: true,
+                      admin: { width: '33%' },
+                    },
+                  ],
+                },
+              ],
+            },
+
+            // Group: External References
+            {
+              type: 'group',
+              name: 'external_refs',
+              label: 'External References',
+              fields: [
+                {
+                  name: 'feed_item_id',
+                  type: 'text',
+                  label: 'Feed Item ID (e.g., SP-2201)',
+                },
+              ],
             },
           ],
-          label: 'Content',
         },
+
+        // ==========================================
+        // TAB 3: E-COMMERCE & INTEGRATION
+        // ==========================================
         {
+          label: 'E-Commerce Details',
           fields: [
             ...defaultCollection.fields,
             {
+              name: 'sync_to_neighborbrite',
+              type: 'checkbox',
+              label: 'Expose to Neighborbrite API Feed',
+              defaultValue: true,
+            },
+            {
               name: 'relatedProducts',
               type: 'relationship',
-              filterOptions: ({ id }) => {
-                if (id) {
-                  return {
-                    id: {
-                      not_in: [id],
-                    },
-                  }
-                }
-
-                // ID comes back as undefined during seeding so we need to handle that case
-                return {
-                  id: {
-                    exists: true,
-                  },
-                }
-              },
               hasMany: true,
               relationTo: 'products',
+              filterOptions: ({ id }) => (id ? { id: { not_in: [id] } } : { id: { exists: true } }),
             },
           ],
-          label: 'Product Details',
         },
+
+        // ==========================================
+        // TAB 4: SEO METADATA
+        // ==========================================
         {
           name: 'meta',
           label: 'SEO',
@@ -177,19 +411,11 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               descriptionPath: 'meta.description',
               imagePath: 'meta.image',
             }),
-            MetaTitleField({
-              hasGenerateFn: true,
-            }),
-            MetaImageField({
-              relationTo: 'media',
-            }),
-
+            MetaTitleField({ hasGenerateFn: true }),
+            MetaImageField({ relationTo: 'media' }),
             MetaDescriptionField({}),
             PreviewField({
-              // if the `generateUrl` function is configured
               hasGenerateFn: true,
-
-              // field paths to match the target field for data
               titlePath: 'meta.title',
               descriptionPath: 'meta.description',
             }),
@@ -197,6 +423,8 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
         },
       ],
     },
+
+    // Sidebar Attributes
     {
       name: 'categories',
       type: 'relationship',

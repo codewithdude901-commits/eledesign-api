@@ -1,6 +1,6 @@
 export const grassProducts = [
   {
-    sku: 'GRS-001',
+    sku: '1101107244',
 
     common_name: {
       de: 'Gold-Kalmus',
@@ -42,7 +42,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-002',
+    sku: '1101106528',
 
     common_name: {
       de: "Garten-Reitgras 'Eldorado'",
@@ -84,7 +84,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-003',
+    sku: '120160101',
 
     common_name: {
       de: "Garten-Reitgras 'Karl Foerster'",
@@ -126,7 +126,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-004',
+    sku: '1101108068',
 
     common_name: {
       de: "Buntes Garten-Reitgras 'Overdam'",
@@ -168,7 +168,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-005',
+    sku: '1101107960',
 
     common_name: {
       de: "Braune Segge 'Green Magic'",
@@ -210,7 +210,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-006',
+    sku: '1101107246',
 
     common_name: {
       de: 'Weißbunte Braune Segge',
@@ -252,7 +252,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-007',
+    sku: '1101107628',
 
     common_name: {
       de: 'Graue Segge',
@@ -294,7 +294,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-008',
+    sku: '1101107792',
 
     common_name: {
       de: "Japan-Segge 'Irish Green'",
@@ -310,9 +310,9 @@ export const grassProducts = [
     category: 'grasses',
     indoor_outdoor: 'outdoor',
 
-    botanical_name: 'Carex morrowii',
+    botanical_name: 'Carex foliosissima',
     cultivar: 'Irish Green',
-    botanical_name_full: "Carex morrowii 'Irish Green'",
+    botanical_name_full: "Carex foliosissima 'Irish Green'",
 
     attributes: {
       hardiness_zone_min: '5',
@@ -336,7 +336,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-009',
+    sku: '1101103898',
 
     common_name: {
       de: "Japan-Segge 'Green Wonder'",
@@ -420,7 +420,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-011',
+    sku: '1101103798',
 
     common_name: {
       de: "Rasen-Schmiele 'Goldgehänge'",
@@ -458,11 +458,11 @@ export const grassProducts = [
     },
 
     plant_size: 'P 0,9',
-    image: '/grass/Deschampsia_cespitosa_Goldgehänge.jpg',
+    image: '/grass/Deschampsia_cespitosa_Goldgehaenge.jpg',
   },
 
   {
-    sku: 'GRS-012',
+    sku: '1101103798',
 
     common_name: {
       de: "Rasen-Schmiele 'Goldschleier'",
@@ -504,7 +504,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-013',
+    sku: '1101107634',
 
     common_name: {
       de: 'Atlas-Schwingel',
@@ -546,7 +546,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-014',
+    sku: '1101107635',
 
     common_name: {
       de: "Schwingel 'Miedzianobrody'",
@@ -588,7 +588,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-015',
+    sku: '1101104088',
 
     common_name: {
       de: 'Japan-Waldgras',
@@ -630,7 +630,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-016',
+    sku: '1101107697',
 
     common_name: {
       de: "Japanisches Blutgras 'Red Baron'",
@@ -672,7 +672,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-017',
+    sku: '1101103996',
 
     common_name: {
       de: "Chinaschilf 'Gracillimus'",
@@ -714,7 +714,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-018',
+    sku: '1101106912',
 
     common_name: {
       de: "Rutenhirse 'Blue Fountain'",
@@ -756,7 +756,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-019',
+    sku: '1101105664',
 
     common_name: {
       de: "Rutenhirse 'Heavy Metal'",
@@ -798,7 +798,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-020',
+    sku: '1101104087',
 
     common_name: {
       de: "Rutenhirse 'Northwind'",
@@ -840,7 +840,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-021',
+    sku: '1101103905',
 
     common_name: {
       de: "Rutenhirse 'Rehbraun'",
@@ -882,7 +882,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-022',
+    sku: '14056',
 
     common_name: {
       de: "Lampenputzergras 'Hameln'",
@@ -924,7 +924,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-023',
+    sku: '1101107795',
 
     common_name: {
       de: 'Herbst-Kopfgras',
@@ -966,7 +966,7 @@ export const grassProducts = [
   },
 
   {
-    sku: 'GRS-024',
+    sku: '1101107712',
 
     common_name: {
       de: "Kopfgras 'Greenlee'",

@@ -1,4 +1,4 @@
-import { ecommercePlugin } from '@payloadcms/plugin-ecommerce'
+import { ecommercePlugin, EUR } from '@payloadcms/plugin-ecommerce'
 import { stripeAdapter } from '@payloadcms/plugin-ecommerce/payments/stripe'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { seoPlugin } from '@payloadcms/plugin-seo'
@@ -17,7 +17,7 @@ import { Page, Product } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Ecommerce Template` : 'Payload Ecommerce Template'
+  return doc?.title ? `${doc.title} ` : 'Eledesign Ecommerce Store'
 }
 
 const generateURL: GenerateURL<Product | Page> = ({ doc }) => {
@@ -126,6 +126,37 @@ export const plugins: Plugin[] = [
     },
     products: {
       productsCollectionOverride: ProductsCollection,
+      variants: {
+        variantsCollectionOverride: ({ defaultCollection }) => ({
+          ...defaultCollection,
+          fields: [
+            ...defaultCollection.fields,
+            {
+              name: 'in_stock',
+              type: 'checkbox',
+              label: 'In Stock',
+              admin: {
+                width: '50%',
+                description: 'This field is only necessry for products of type "garden".',
+                // condition: (data, siblingData) => siblingData?.product?.product_type === 'garden',
+              },
+            },
+            {
+              name: 'total_plant_quantity',
+              type: 'number',
+              label: 'Total Plant Quantity',
+              admin: {
+                width: '50%',
+                description: 'This field is only necessry for products of type "garden".',
+              },
+            },
+          ],
+        }),
+      },
+    },
+    currencies: {
+      supportedCurrencies: [EUR],
+      defaultCurrency: 'EUR',
     },
   }),
   s3Storage({

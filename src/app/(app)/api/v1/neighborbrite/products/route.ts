@@ -35,6 +35,9 @@ export async function GET(req: NextRequest) {
         _status: {
           equals: 'published',
         },
+        product_type: {
+          equals: 'plant',
+        },
       },
       limit: 100,
     })
@@ -60,6 +63,16 @@ export async function GET(req: NextRequest) {
       //     : 'perennials'
 
       const attrs = doc.attributes || {}
+      const containerSize =
+        doc?.pot_size === 'P 0,5'
+          ? '9 cm'
+          : doc?.pot_size === 'P 0,5 Bio'
+            ? '9 cm'
+            : doc?.pot_size === 'T 10'
+              ? '10 cm'
+              : doc?.pot_size === 'T 14'
+                ? '14 cm'
+                : ''
 
       return {
         id: doc.id,
@@ -72,6 +85,7 @@ export async function GET(req: NextRequest) {
         descriptions: doc.description || {}, // Payload localized object: { "de": "...", "en": "..." }
         category: doc.category || '',
         indoor_outdoor: doc.indoor_outdoor || 'outdoor',
+        container_size: containerSize,
         images: images,
         attributes: {
           hardiness_zone_min: attrs.hardiness_zone_min || '',

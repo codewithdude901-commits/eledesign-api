@@ -60,13 +60,14 @@ async function seedGrass() {
 
         title: product.botanical_name,
         slug: createSlug(product.botanical_name_full),
+        product_type: 'plant',
 
         // Localized fields
         common_name: product.common_name.de,
         description: product.description.de,
 
         // Basic product information
-        status: product.status,
+        product_status: product.status,
         category: product.category,
         indoor_outdoor: product.indoor_outdoor,
 
@@ -77,6 +78,7 @@ async function seedGrass() {
 
         // Plant attributes
         attributes: {
+          
           hardiness_zone_min: product.attributes.hardiness_zone_min,
 
           sunlight: product.attributes.sunlight,

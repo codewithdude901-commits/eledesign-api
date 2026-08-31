@@ -1,10 +1,10 @@
 import { Grid } from '@/components/Grid'
 import { ProductGridItem } from '@/components/ProductGridItem'
 import configPromise from '@payload-config'
+import { Metadata } from 'next'
 import { getPayload } from 'payload'
-import React from 'react'
 
-export const metadata = {
+export const metadata :Metadata= {
   description: 'Search for products in the store.',
   title: 'Shop',
 }
@@ -28,7 +28,7 @@ export default async function ShopPage({ searchParams }: Props) {
       slug: true,
       gallery: true,
       categories: true,
-      priceInUSD: true,
+      priceInEUR: true,
     },
     ...(sort ? { sort } : { sort: 'title' }),
     ...(searchValue || category

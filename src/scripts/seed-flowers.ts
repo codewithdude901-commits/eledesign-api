@@ -6,7 +6,6 @@ import { getPayload } from 'payload'
 import configPromise from '../payload.config'
 import { flowerProducts } from '@/data/flowers'
 
-
 async function seedGrass() {
   const config = await configPromise
   const payload = await getPayload({ config })
@@ -15,45 +14,45 @@ async function seedGrass() {
 
   for (const product of flowerProducts) {
     try {
-      let mediaId: string | number | undefined = undefined
+      // let mediaId: string | number | undefined = undefined
 
       // 1. Resolve and upload local image to R2 via Payload Media collection
-      if (product.image) {
-        const relativeImagePath = product.image.startsWith('/')
-          ? product.image.slice(1)
-          : product.image
+      // if (product.image) {
+      //   const relativeImagePath = product.image.startsWith('/')
+      //     ? product.image.slice(1)
+      //     : product.image
 
-        const absoluteImagePath = path.resolve(process.cwd(), 'public', relativeImagePath)
+      //   const absoluteImagePath = path.resolve(process.cwd(), 'public', relativeImagePath)
 
-        if (fs.existsSync(absoluteImagePath)) {
-          const fileName = path.basename(absoluteImagePath)
-          const fileBuffer = fs.readFileSync(absoluteImagePath)
-          const fileSize = fs.statSync(absoluteImagePath).size
+      //   if (fs.existsSync(absoluteImagePath)) {
+      //     const fileName = path.basename(absoluteImagePath)
+      //     const fileBuffer = fs.readFileSync(absoluteImagePath)
+      //     const fileSize = fs.statSync(absoluteImagePath).size
 
-          const mediaDoc = await payload.create({
-            collection: 'media',
+      //     const mediaDoc = await payload.create({
+      //       collection: 'media',
 
-            data: {
-              alt: product.common_name.en,
-            },
+      //       data: {
+      //         alt: product.common_name.en,
+      //       },
 
-            file: {
-              data: fileBuffer,
-              name: fileName,
-              mimetype: getMimeType(fileName),
-              size: fileSize,
-            },
-          })
+      //       file: {
+      //         data: fileBuffer,
+      //         name: fileName,
+      //         mimetype: getMimeType(fileName),
+      //         size: fileSize,
+      //       },
+      //     })
 
-          mediaId = mediaDoc.id
+      //     mediaId = mediaDoc.id
 
-          console.log(`Uploaded image for ${product.common_name.en} -> ID: ${mediaId}`)
-        } else {
-          console.warn(
-            `File not found at ${absoluteImagePath}. Skipping image upload for ${product.common_name.en}.`,
-          )
-        }
-      }
+      //     console.log(`Uploaded image for ${product.common_name.en} -> ID: ${mediaId}`)
+      //   } else {
+      //     console.warn(
+      //       `File not found at ${absoluteImagePath}. Skipping image upload for ${product.common_name.en}.`,
+      //     )
+      //   }
+      // }
 
       // 2. Prepare product data
       const productData: Record<string, any> = {
@@ -61,13 +60,14 @@ async function seedGrass() {
 
         title: product.botanical_name,
         slug: createSlug(product.botanical_name_full),
+        product_type: 'plant',
 
         // Localized fields
         common_name: product.common_name.de,
         description: product.description.de,
 
         // Basic product information
-        status: product.status,
+        product_status: product.status,
         category: product.category,
         indoor_outdoor: product.indoor_outdoor,
 
@@ -109,13 +109,13 @@ async function seedGrass() {
       }
 
       // 3. Add uploaded media to gallery
-      if (mediaId) {
-        productData.gallery = [
-          {
-            image: mediaId,
-          },
-        ]
-      }
+      // if (mediaId) {
+      //   productData.gallery = [
+      //     {
+      //       image: mediaId,
+      //     },
+      //   ]
+      // }
 
       // 4. Create Product record
       const createdProduct = await payload.create({

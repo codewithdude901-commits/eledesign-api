@@ -14,24 +14,26 @@ import { ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
+import { Button } from '@/components/ui/button'
+import { Product } from '@/payload-types'
+import { useCartUI } from '@/providers/CartUIContext'
 import { DeleteItemButton } from './DeleteItemButton'
 import { EditItemQuantityButton } from './EditItemQuantityButton'
 import { OpenCartButton } from './OpenCart'
-import { Button } from '@/components/ui/button'
-import { Product } from '@/payload-types'
 
 export function CartModal() {
   const { cart } = useCart()
-  const [isOpen, setIsOpen] = useState(false)
+  // const [isOpen, setIsOpen] = useState(false)
+  const { isCartOpen, openCart, closeCart } = useCartUI()
 
   const pathname = usePathname()
 
   useEffect(() => {
     // Close the cart modal when the pathname changes.
-    setIsOpen(false)
-  }, [pathname])
+    closeCart()
+  }, [pathname, closeCart])
 
   const totalQuantity = useMemo(() => {
     if (!cart || !cart.items || !cart.items.length) return undefined
@@ -39,7 +41,16 @@ export function CartModal() {
   }, [cart])
 
   return (
-    <Sheet onOpenChange={setIsOpen} open={isOpen}>
+    <Sheet
+      open={isCartOpen}
+      onOpenChange={(open) => {
+        if (open) {
+          openCart()
+        } else {
+          closeCart()
+        }
+      }}
+    >
       <SheetTrigger asChild>
         <OpenCartButton quantity={totalQuantity} />
       </SheetTrigger>
@@ -78,12 +89,12 @@ export function CartModal() {
                       : undefined
 
                   let image = firstGalleryImage || metaImage
-                  let price = product.priceInUSD
+                  let price = product.priceInEUR
 
                   const isVariant = Boolean(variant) && typeof variant === 'object'
 
                   if (isVariant) {
-                    price = variant?.priceInUSD
+                    price = variant?.priceInEUR
 
                     const imageVariant = product.gallery?.find((item) => {
                       if (!item.variantOption) return false

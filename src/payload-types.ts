@@ -254,7 +254,7 @@ export interface Order {
   transactions?: (string | Transaction)[] | null;
   status?: OrderStatus;
   amount?: number | null;
-  currency?: 'USD' | null;
+  currency?: 'EUR' | null;
   accessToken?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -266,13 +266,16 @@ export interface Order {
 export interface Product {
   id: string;
   title: string;
-  status?: ('active' | 'archived') | null;
+  /**
+   * Determines whether this product is a standalone plant or a bundled garden set.
+   */
+  product_type: 'plant' | 'garden';
+  product_status?: ('active' | 'archived') | null;
+  sku: string;
   /**
    * Localized plant name mapping directly to Neighborbrite "names" field.
    */
   common_name: string;
-  sku: string;
-  category?: ('perennials' | 'grasses') | null;
   description?: string | null;
   gallery?:
     | {
@@ -280,11 +283,11 @@ export interface Product {
         id?: string | null;
       }[]
     | null;
+  category?: ('perennials' | 'grasses') | null;
   botanical_name: string;
   cultivar?: string | null;
   botanical_name_full?: string | null;
   indoor_outdoor?: ('outdoor' | 'indoor' | 'both') | null;
-  style_tags?: ('pollinator-garden' | 'cottage-garden' | 'modern-minimalist' | 'prairie-garden')[] | null;
   attributes?: {
     hardiness_zone_min?: string | null;
     foliage_type?: ('deciduous' | 'evergreen' | 'semi_evergreen') | null;
@@ -311,6 +314,7 @@ export interface Product {
       | null;
     flower_color?:
       | (
+          | 'mixed'
           | 'orange'
           | 'yellow'
           | 'red'
@@ -337,6 +341,16 @@ export interface Product {
   external_refs?: {
     feed_item_id?: string | null;
   };
+  maintenance_level_garden_set?: ('low' | 'high') | null;
+  sunlight_garden_set?: ('full_sun' | 'partial_sun' | 'shade')[] | null;
+  set_items?:
+    | {
+        plant: string | Product;
+        density_per_sqm: number;
+        id?: string | null;
+      }[]
+    | null;
+  style_tags?: ('pollinator-garden' | 'cottage-garden' | 'modern-minimalist' | 'prairie-garden')[] | null;
   inventory?: number | null;
   enableVariants?: boolean | null;
   variantTypes?: (string | VariantType)[] | null;
@@ -345,9 +359,12 @@ export interface Product {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
-  priceInUSDEnabled?: boolean | null;
-  priceInUSD?: number | null;
+  priceInEUREnabled?: boolean | null;
+  priceInEUR?: number | null;
   sync_to_neighborbrite?: boolean | null;
+  pot_size?: ('P 0,5 Bio' | 'P 0,5' | 'T 10' | 'T 14') | null;
+  product_url?: string | null;
+  purchase_url?: string | null;
   relatedProducts?: (string | Product)[] | null;
   meta?: {
     title?: string | null;
@@ -449,8 +466,16 @@ export interface Variant {
   product: string | Product;
   options: (string | VariantOption)[];
   inventory?: number | null;
-  priceInUSDEnabled?: boolean | null;
-  priceInUSD?: number | null;
+  priceInEUREnabled?: boolean | null;
+  priceInEUR?: number | null;
+  /**
+   * This field is only necessry for products of type "garden".
+   */
+  in_stock?: boolean | null;
+  /**
+   * This field is only necessry for products of type "garden".
+   */
+  total_plant_quantity?: number | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -509,7 +534,7 @@ export interface Transaction {
   order?: (string | null) | Order;
   cart?: (string | null) | Cart;
   amount?: number | null;
-  currency?: 'USD' | null;
+  currency?: 'EUR' | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -532,7 +557,7 @@ export interface Cart {
   purchasedAt?: string | null;
   status?: ('active' | 'purchased' | 'abandoned') | null;
   subtotal?: number | null;
-  currency?: 'USD' | null;
+  currency?: 'EUR' | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1606,8 +1631,10 @@ export interface VariantsSelect<T extends boolean = true> {
   product?: T;
   options?: T;
   inventory?: T;
-  priceInUSDEnabled?: T;
-  priceInUSD?: T;
+  priceInEUREnabled?: T;
+  priceInEUR?: T;
+  in_stock?: T;
+  total_plant_quantity?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1644,10 +1671,10 @@ export interface VariantOptionsSelect<T extends boolean = true> {
  */
 export interface ProductsSelect<T extends boolean = true> {
   title?: T;
-  status?: T;
-  common_name?: T;
+  product_type?: T;
+  product_status?: T;
   sku?: T;
-  category?: T;
+  common_name?: T;
   description?: T;
   gallery?:
     | T
@@ -1655,11 +1682,11 @@ export interface ProductsSelect<T extends boolean = true> {
         image?: T;
         id?: T;
       };
+  category?: T;
   botanical_name?: T;
   cultivar?: T;
   botanical_name_full?: T;
   indoor_outdoor?: T;
-  style_tags?: T;
   attributes?:
     | T
     | {
@@ -1683,13 +1710,26 @@ export interface ProductsSelect<T extends boolean = true> {
     | {
         feed_item_id?: T;
       };
+  maintenance_level_garden_set?: T;
+  sunlight_garden_set?: T;
+  set_items?:
+    | T
+    | {
+        plant?: T;
+        density_per_sqm?: T;
+        id?: T;
+      };
+  style_tags?: T;
   inventory?: T;
   enableVariants?: T;
   variantTypes?: T;
   variants?: T;
-  priceInUSDEnabled?: T;
-  priceInUSD?: T;
+  priceInEUREnabled?: T;
+  priceInEUR?: T;
   sync_to_neighborbrite?: T;
+  pot_size?: T;
+  product_url?: T;
+  purchase_url?: T;
   relatedProducts?: T;
   meta?:
     | T

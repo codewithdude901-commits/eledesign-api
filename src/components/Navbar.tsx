@@ -3,12 +3,12 @@
 import { User } from 'lucide-react'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
-import React, { Suspense, useRef, useState } from 'react'
+import React, { Suspense } from 'react'
 import { Cart } from './Cart'
 import { OpenCartButton } from './Cart/OpenCart'
 import { MobileMenu } from './MobileMenu'
 
-import { LocaleSwitcher } from '@/components/LocaleSwitcher'
+// import { LocaleSwitcher } from '@/components/LocaleSwitcher'
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname()
@@ -17,10 +17,10 @@ export const Navbar: React.FC = () => {
 
   const locale = params.locale
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  // const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  // const [isProfileOpen, setIsProfileOpen] = useState(false)
 
-  const profileRef = useRef<HTMLDivElement>(null)
+  // const profileRef = useRef<HTMLDivElement>(null)
 
   const navLinksDe = [
     { name: 'Gartenpakete', href: '/gardens' },
@@ -77,7 +77,7 @@ export const Navbar: React.FC = () => {
 
           {/* Right: Actions */}
           <div className="flex items-center space-x-2 ">
-            <LocaleSwitcher />
+            {/* <LocaleSwitcher /> */}
             <Link
               href={`/${locale}/account`}
               className="p-2.5 rounded-full text-black  hover:bg-black/5 transition-all duration-200 focus:outline-none  items-center justify-center hidden md:flex"

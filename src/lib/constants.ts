@@ -16,3 +16,37 @@ export const sorting: SortFilterItem[] = [
   { slug: 'priceInEUR', reverse: false, title: 'Price: Low to high' }, // asc
   { slug: '-priceInEUR', reverse: true, title: 'Price: High to low' },
 ]
+
+export const maintenanceFilters = [
+  {
+    title: 'All',
+    value: '',
+  },
+  {
+    title: 'Low',
+    value: 'low',
+  },
+  {
+    title: 'I Love Gardening',
+    value: 'high',
+  },
+]
+
+export const sunlightFilters = [
+  {
+    title: 'All',
+    value: '',
+  },
+  {
+    title: 'Full Sun',
+    value: 'full_sun',
+  },
+  {
+    title: 'Partial Sun',
+    value: 'partial_sun',
+  },
+  {
+    title: 'Full Shade',
+    value: 'shade',
+  },
+]

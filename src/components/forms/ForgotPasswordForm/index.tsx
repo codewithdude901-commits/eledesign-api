@@ -14,7 +14,11 @@ type FormData = {
   email: string
 }
 
-export const ForgotPasswordForm: React.FC = () => {
+type Props = {
+  locale: string
+}
+
+export const ForgotPasswordForm: React.FC<Props> = ({ locale }: Props) => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
@@ -41,7 +45,9 @@ export const ForgotPasswordForm: React.FC = () => {
       setError('')
     } else {
       setError(
-        'There was a problem while attempting to send you a password reset email. Please try again.',
+        locale === 'de'
+          ? 'Es gab ein Problem beim Senden der E-Mail zum Zurücksetzen Ihres Passworts. Bitte versuchen Sie es erneut.'
+          : 'There was a problem while attempting to send you a password reset email. Please try again.',
       )
     }
   }, [])
@@ -50,12 +56,14 @@ export const ForgotPasswordForm: React.FC = () => {
     <Fragment>
       {!success && (
         <React.Fragment>
-          <h1 className="text-xl mb-4">Forgot Password</h1>
+          <h1 className="text-xl mb-4">
+            {locale === 'de' ? 'Passwort vergessen' : 'Forgot Password'}
+          </h1>
           <div className="prose dark:prose-invert mb-8">
             <p>
-              {`Please enter your email below. You will receive an email message with instructions on
-              how to reset your password. To manage your all users, `}
-              <Link href="/admin/collections/users">login to the admin dashboard</Link>.
+              {locale === 'de'
+                ? 'Bitte geben Sie Ihre E-Mail-Adresse unten ein. Sie erhalten eine E-Mail mit Anweisungen zum Zurücksetzen Ihres Passworts.'
+                : 'Please enter your email below. You will receive an email message with instructions on how to reset your password.'}
             </p>
           </div>
           <form className="max-w-lg" onSubmit={handleSubmit(onSubmit)}>
@@ -74,16 +82,22 @@ export const ForgotPasswordForm: React.FC = () => {
             </FormItem>
 
             <Button type="submit" variant="default">
-              Forgot Password
+              {locale === 'de' ? 'Passwort vergessen' : 'Forgot Password'}
             </Button>
           </form>
         </React.Fragment>
       )}
       {success && (
         <React.Fragment>
-          <h1 className="text-xl mb-4">Request submitted</h1>
+          <h1 className="text-xl mb-4">
+            {locale === 'de' ? 'Anfrage eingereicht' : 'Request submitted'}
+          </h1>
           <div className="prose dark:prose-invert">
-            <p>Check your email for a link that will allow you to securely reset your password.</p>
+            <p>
+              {locale === 'de'
+                ? 'Überprüfen Sie Ihre E-Mail auf einen Link, mit dem Sie Ihr Passwort sicher zurücksetzen können.'
+                : 'Check your email for a link that will allow you to securely reset your password.'}
+            </p>
           </div>
         </React.Fragment>
       )}

@@ -2,7 +2,6 @@
 
 import { FormError } from '@/components/forms/FormError'
 import { FormItem } from '@/components/forms/FormItem'
-import { Message } from '@/components/Message'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,7 +19,7 @@ type FormData = {
   passwordConfirm: string
 }
 
-export const AccountForm: React.FC = () => {
+export const AccountForm: React.FC<{ locale: string }> = ({ locale }) => {
   const { setUser, user } = useAuth()
   const [changePassword, setChangePassword] = useState(false)
 
@@ -95,23 +94,25 @@ export const AccountForm: React.FC = () => {
         <Fragment>
           <div className="prose dark:prose-invert mb-8">
             <p className="">
-              {'Change your account details below, or '}
+              {locale === 'de'
+                ? 'Ändern Sie Ihre Kontodaten unten, oder '
+                : 'Change your account details below, or '}
               <Button
                 className="px-0 text-inherit underline hover:cursor-pointer"
                 onClick={() => setChangePassword(!changePassword)}
                 type="button"
                 variant="link"
               >
-                click here
+                {locale === 'de' ? 'hier klicken' : 'click here'}
               </Button>
-              {' to change your password.'}
+              {locale === 'de' ? ' um Ihr Passwort zu ändern.' : ' to change your password.'}
             </p>
           </div>
 
           <div className="flex flex-col gap-8 mb-8">
             <FormItem>
               <Label htmlFor="email" className="mb-2">
-                Email Address
+                {locale === 'de' ? 'E-Mail-Adresse' : 'Email Address'}
               </Label>
               <Input
                 id="email"
@@ -123,7 +124,7 @@ export const AccountForm: React.FC = () => {
 
             <FormItem>
               <Label htmlFor="name" className="mb-2">
-                Name
+                {locale === 'de' ? 'Name' : 'Name'}
               </Label>
               <Input
                 id="name"
@@ -138,14 +139,16 @@ export const AccountForm: React.FC = () => {
         <Fragment>
           <div className="prose dark:prose-invert mb-8">
             <p>
-              {'Change your password below, or '}
+              {locale === 'de'
+                ? 'Ändern Sie Ihr Passwort unten, oder '
+                : 'Change your password below, or '}
               <Button
                 className="px-0 text-inherit underline hover:cursor-pointer"
                 onClick={() => setChangePassword(!changePassword)}
                 type="button"
                 variant="link"
               >
-                cancel
+                {locale === 'de' ? 'abbrechen' : 'cancel'}
               </Button>
               .
             </p>
@@ -154,7 +157,7 @@ export const AccountForm: React.FC = () => {
           <div className="flex flex-col gap-8 mb-8">
             <FormItem>
               <Label htmlFor="password" className="mb-2">
-                New password
+                {locale === 'de' ? 'Neues Passwort' : 'New password'}
               </Label>
               <Input
                 id="password"
@@ -166,7 +169,7 @@ export const AccountForm: React.FC = () => {
 
             <FormItem>
               <Label htmlFor="passwordConfirm" className="mb-2">
-                Confirm password
+                {locale === 'de' ? 'Passwort bestätigen' : 'Confirm password'}
               </Label>
               <Input
                 id="passwordConfirm"
@@ -183,10 +186,16 @@ export const AccountForm: React.FC = () => {
       )}
       <Button disabled={isLoading || isSubmitting || !isDirty} type="submit" variant="default">
         {isLoading || isSubmitting
-          ? 'Processing'
+          ? locale === 'de'
+            ? 'Wird verarbeitet'
+            : 'Processing'
           : changePassword
-            ? 'Change Password'
-            : 'Update Account'}
+            ? locale === 'de'
+              ? 'Passwort ändern'
+              : 'Change Password'
+            : locale === 'de'
+              ? 'Konto aktualisieren'
+              : 'Update Account'}
       </Button>
     </form>
   )

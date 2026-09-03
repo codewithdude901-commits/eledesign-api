@@ -124,6 +124,7 @@ export const plugins: Plugin[] = [
         }),
       ],
     },
+
     products: {
       productsCollectionOverride: ProductsCollection,
       variants: {

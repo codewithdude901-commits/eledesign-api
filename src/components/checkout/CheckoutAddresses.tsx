@@ -20,12 +20,14 @@ type Props = {
   heading?: string
   description?: string
   setSubmit?: React.Dispatch<React.SetStateAction<() => void | Promise<void>>>
+  locale: 'de' | 'en'
 }
 
 export const CheckoutAddresses: React.FC<Props> = ({
   setAddress,
   heading = 'Addresses',
   description = 'Please select or add your shipping and billing addresses.',
+  locale,
 }) => {
   const { addresses } = useAddresses()
 
@@ -34,7 +36,7 @@ export const CheckoutAddresses: React.FC<Props> = ({
       <div>
         <p>No addresses found. Please add an address.</p>
 
-        <CreateAddressModal />
+        <CreateAddressModal locale={locale} />
       </div>
     )
   }
@@ -45,12 +47,12 @@ export const CheckoutAddresses: React.FC<Props> = ({
         <h3 className="text-xl font-medium mb-2">{heading}</h3>
         <p className="text-muted-foreground">{description}</p>
       </div>
-      <AddressesModal setAddress={setAddress} />
+      <AddressesModal setAddress={setAddress} locale={locale} />
     </div>
   )
 }
 
-const AddressesModal: React.FC<Props> = ({ setAddress }) => {
+const AddressesModal: React.FC<Props> = ({ setAddress, locale }) => {
   const [open, setOpen] = useState(false)
   const handleOpenChange = (state: boolean) => {
     setOpen(state)
@@ -80,7 +82,9 @@ const AddressesModal: React.FC<Props> = ({ setAddress }) => {
             {addresses.map((address) => (
               <li key={address.id} className="border-b pb-8 last:border-none">
                 <AddressItem
+                  locale={locale}
                   address={address}
+                  hideDefaultActions
                   beforeActions={
                     <Button
                       onClick={(e) => {
@@ -97,7 +101,7 @@ const AddressesModal: React.FC<Props> = ({ setAddress }) => {
             ))}
           </ul>
 
-          <CreateAddressModal />
+          <CreateAddressModal locale={locale} />
         </div>
       </DialogContent>
     </Dialog>

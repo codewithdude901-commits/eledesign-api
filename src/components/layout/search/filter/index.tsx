@@ -1,40 +1,33 @@
 import type { SortFilterItem } from '@/lib/constants'
 
-import React, { Suspense } from 'react'
-
 import { FilterItemDropdown } from './FilterItemDropdown'
-import { FilterItem } from './FilterItem'
-export type ListItem = PathFilterItem | SortFilterItem
-export type PathFilterItem = { path: string; title: string }
 
-function FilterItemList({ list }: { list: ListItem[] }) {
-  return (
-    <React.Fragment>
-      {list.map((item: ListItem, i) => (
-        <FilterItem item={item} key={i} />
-      ))}
-    </React.Fragment>
-  )
+export type PathFilterItem = {
+  path: string
+  title: string
 }
 
-export function FilterList({ list, title }: { list: ListItem[]; title?: string }) {
+export type FilterOption = {
+  title: string
+  value: string
+}
+
+export type ListItem = PathFilterItem | SortFilterItem
+
+type FilterListProps = {
+  sorting: SortFilterItem[]
+  maintenance: FilterOption[]
+  sunlight: FilterOption[]
+}
+
+export function FilterList({ sorting, maintenance, sunlight }: FilterListProps) {
   return (
-    <React.Fragment>
-      <nav>
-        {title ? (
-          <h3 className="text-xs mb-2 text-neutral-500 dark:text-neutral-400">{title}</h3>
-        ) : null}
-        <ul className="hidden md:block">
-          <Suspense fallback={null}>
-            <FilterItemList list={list} />
-          </Suspense>
-        </ul>
-        <ul className="md:hidden">
-          <Suspense fallback={null}>
-            <FilterItemDropdown list={list} />
-          </Suspense>
-        </ul>
-      </nav>
-    </React.Fragment>
+    <div className="flex w-full flex-col gap-3 md:flex-row md:items-end lg:justify-end">
+      <FilterItemDropdown list={maintenance} param="maintenance" title="Maintenance" />
+
+      <FilterItemDropdown list={sunlight} param="sunlight" title="Sunlight" />
+
+      <FilterItemDropdown list={sorting} param="sort" title="Sort by" />
+    </div>
   )
 }

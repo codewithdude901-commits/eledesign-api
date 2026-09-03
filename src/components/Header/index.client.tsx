@@ -11,6 +11,7 @@ import type { Header } from 'src/payload-types'
 import { LogoIcon } from '@/components/icons/logo'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/utilities/cn'
+import { User } from 'lucide-react'
 
 type Props = {
   header: Header
@@ -54,10 +55,16 @@ export function HeaderClient({ header }: Props) {
             ) : null}
           </div>
 
-          <div className="flex justify-end md:w-1/3 gap-4">
+          <div className="flex justify-end md:w-1/3 gap-1 my-auto items-center">
             <Suspense fallback={<OpenCartButton />}>
               <Cart />
             </Suspense>
+            <Link
+              href={''}
+              className="p-2.5 rounded-full text-black  hover:bg-black/5 transition-all duration-200 focus:outline-none flex items-center justify-center"
+            >
+              <User className='w-5.5 h-5.5'/>
+            </Link>
           </div>
         </div>
       </nav>

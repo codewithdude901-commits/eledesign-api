@@ -11,7 +11,7 @@ import { useTheme } from '@/providers/Theme'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import React, { Suspense, useCallback, useEffect, useState } from 'react'
 
 import { cssVariables } from '@/cssVariables'
@@ -35,6 +35,9 @@ export const CheckoutPage: React.FC = () => {
   const { cart } = useCart()
   const [error, setError] = useState<null | string>(null)
   const { theme } = useTheme()
+  const params = useParams<{ locale: 'de' | 'en' }>()
+
+  const locale = params.locale
   /**
    * State to manage the email input for guest checkout.
    */
@@ -192,6 +195,7 @@ export const CheckoutPage: React.FC = () => {
         {billingAddress ? (
           <div>
             <AddressItem
+              locale={locale}
               actions={
                 <Button
                   variant={'outline'}
@@ -208,9 +212,14 @@ export const CheckoutPage: React.FC = () => {
             />
           </div>
         ) : user ? (
-          <CheckoutAddresses heading="Billing address" setAddress={setBillingAddress} />
+          <CheckoutAddresses
+            heading="Billing address"
+            setAddress={setBillingAddress}
+            locale={locale}
+          />
         ) : (
           <CreateAddressModal
+            locale={locale}
             disabled={!email || Boolean(emailEditable)}
             callback={(address) => {
               setBillingAddress(address)
@@ -236,6 +245,7 @@ export const CheckoutPage: React.FC = () => {
             {shippingAddress ? (
               <div>
                 <AddressItem
+                  locale={locale}
                   actions={
                     <Button
                       variant={'outline'}
@@ -253,12 +263,14 @@ export const CheckoutPage: React.FC = () => {
               </div>
             ) : user ? (
               <CheckoutAddresses
+                locale={locale}
                 heading="Shipping address"
                 description="Please select a shipping address."
                 setAddress={setShippingAddress}
               />
             ) : (
               <CreateAddressModal
+                locale={locale}
                 callback={(address) => {
                   setShippingAddress(address)
                 }}

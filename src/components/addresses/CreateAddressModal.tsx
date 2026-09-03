@@ -21,13 +21,15 @@ type Props = {
   callback?: (address: Partial<Address>) => void
   skipSubmission?: boolean
   disabled?: boolean
+  locale: 'de' | 'en'
 }
 
 export const CreateAddressModal: React.FC<Props> = ({
   addressID,
   initialData,
-  buttonText = 'Add a new address',
-  modalTitle = 'Add a new address',
+  locale,
+  buttonText = locale === 'de' ? 'Eine neue Adresse hinzufügen' : 'Add a new address',
+  modalTitle = locale === 'de' ? 'Eine neue Adresse hinzufügen' : 'Add a new address',
   callback,
   skipSubmission,
   disabled,
@@ -57,7 +59,9 @@ export const CreateAddressModal: React.FC<Props> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{modalTitle}</DialogTitle>
-          <DialogDescription>This address will be connected to your account.</DialogDescription>
+          <DialogDescription>
+            {locale === 'de' ? 'Diese Adresse wird mit Ihrem Konto verknüpft.' : 'This address will be connected to your account.'}
+          </DialogDescription>
         </DialogHeader>
 
         <AddressForm

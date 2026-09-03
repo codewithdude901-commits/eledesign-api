@@ -45,6 +45,7 @@ export const Providers: React.FC<{
                   publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
                 }),
               ]}
+              
             >
               {children}
             </EcommerceProvider>

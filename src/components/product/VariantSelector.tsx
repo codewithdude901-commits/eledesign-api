@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import type { Product } from '@/payload-types'
 
 import { createUrl } from '@/utilities/createUrl'
-import clsx from 'clsx'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 
@@ -33,7 +32,7 @@ export function VariantSelector({ product }: { product: Product }) {
 
     return (
       <dl className="" key={type.id}>
-        <dt className="mb-4 text-sm">{type.label}</dt>
+        <dt className="mb-4 text-sm font-medium">{type.label}</dt>
         <dd className="flex flex-wrap gap-3">
           <React.Fragment>
             {options?.map((option) => {
@@ -96,11 +95,12 @@ export function VariantSelector({ product }: { product: Product }) {
 
               return (
                 <Button
-                  variant={'ghost'}
+                  variant={isActive ? 'default' : 'ghost'}
                   aria-disabled={!isAvailableForSale}
-                  className={clsx('px-2', {
-                    'bg-primary/5 text-primary': isActive,
-                  })}
+                  // className={clsx('px-2', {
+                  //   'bg-primary/5 text-primary': isActive,
+                  // })}
+                  className=""
                   disabled={!isAvailableForSale}
                   key={option.id}
                   onClick={() => {
@@ -108,6 +108,7 @@ export function VariantSelector({ product }: { product: Product }) {
                       scroll: false,
                     })
                   }}
+              
                   title={`${option.label} ${!isAvailableForSale ? ' (Out of Stock)' : ''}`}
                 >
                   {option.label}

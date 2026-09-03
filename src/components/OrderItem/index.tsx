@@ -7,9 +7,10 @@ import Link from 'next/link'
 
 type Props = {
   order: Order
+  locale: string
 }
 
-export const OrderItem: React.FC<Props> = ({ order }) => {
+export const OrderItem: React.FC<Props> = ({ order, locale }) => {
   const itemsLabel = order.items?.length === 1 ? 'Item' : 'Items'
 
   return (
@@ -41,7 +42,9 @@ export const OrderItem: React.FC<Props> = ({ order }) => {
       </div>
 
       <Button variant="outline" asChild className="self-start sm:self-auto">
-        <Link href={`/orders/${order.id}`}>View Order</Link>
+        <Link href={`/orders/${order.id}`}>
+          {locale === 'de' ? 'Bestellung ansehen' : 'View Order'}
+        </Link>
       </Button>
     </div>
   )

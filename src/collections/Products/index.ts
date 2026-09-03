@@ -38,6 +38,10 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     botanical_name: true,
     gallery: true,
     meta: true,
+    description: true,
+    maintenance_level_garden_set: true,
+    priceInEUR: true,
+    common_name: true,
   },
 
   fields: [
@@ -148,7 +152,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
                 {
                   name: 'category',
                   type: 'select',
-    
+
                   options: [
                     { label: 'Perennials', value: 'perennials' },
                     { label: 'Grasses', value: 'grasses' },
@@ -181,7 +185,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
                 {
                   name: 'indoor_outdoor',
                   type: 'select',
-                
+
                   label: 'Indoor / Outdoor',
                   options: [
                     { label: 'Outdoor', value: 'outdoor' },

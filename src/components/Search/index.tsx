@@ -27,14 +27,23 @@ export const Search: React.FC<Props> = ({ className }) => {
       newParams.delete('q')
     }
 
-    router.push(createUrl('/shop', newParams))
+    router.push(createUrl('/gardens', newParams))
   }
 
   return (
     <form className={cn('relative w-full', className)} onSubmit={onSubmit}>
       <input
         autoComplete="off"
-        className="w-full rounded-lg border bg-white px-4 py-2 text-sm text-black placeholder:text-neutral-500 dark:border-neutral-800 dark:bg-black dark:text-white dark:placeholder:text-neutral-400"
+        className="
+    w-full border bg-white
+    px-4 py-2 text-sm text-black
+    placeholder:text-neutral-500
+   
+    dark:border-neutral-800
+    dark:bg-black
+    dark:text-white
+    dark:placeholder:text-neutral-400
+  "
         defaultValue={searchParams?.get('q') || ''}
         key={searchParams?.get('q')}
         name="search"

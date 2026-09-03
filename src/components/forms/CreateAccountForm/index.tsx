@@ -18,7 +18,7 @@ type FormData = {
   passwordConfirm: string
 }
 
-export const CreateAccountForm: React.FC = () => {
+export const CreateAccountForm: React.FC<{ locale: string }> = ({ locale }) => {
   const searchParams = useSearchParams()
   const allParams = searchParams.toString() ? `?${searchParams.toString()}` : ''
   const { login } = useAuth()
@@ -62,10 +62,10 @@ export const CreateAccountForm: React.FC = () => {
         await login(data)
         clearTimeout(timer)
         if (redirect) router.push(redirect)
-        else router.push(`/account?success=${encodeURIComponent('Account created successfully')}`)
+        else router.push(`/${locale}/account?success=${encodeURIComponent(locale === 'de' ? 'Konto erfolgreich erstellt' : 'Account created successfully')}`)
       } catch (_) {
         clearTimeout(timer)
-        setError('There was an error with the credentials provided. Please try again.')
+        setError(locale === 'de' ? 'There was an error with the credentials provided. Please try again.' : 'There was an error with the credentials provided. Please try again.')
       }
     },
     [login, router, searchParams],
@@ -75,8 +75,10 @@ export const CreateAccountForm: React.FC = () => {
     <form className="max-w-lg py-4" onSubmit={handleSubmit(onSubmit)}>
       <div className="prose dark:prose-invert mb-6">
         <p>
-          {`This is where new customers can signup and create a new account. To manage all users, `}
-          <Link href="/admin/collections/users">login to the admin dashboard</Link>.
+          {locale === 'de'
+            ? 'Dies ist der Ort, an dem neue Kunden sich registrieren und ein neues Konto erstellen können. Um alle Benutzer zu verwalten, '
+            : 'This is where new customers can signup and create a new account.'}
+         
         </p>
       </div>
 
@@ -85,7 +87,7 @@ export const CreateAccountForm: React.FC = () => {
       <div className="flex flex-col gap-8 mb-8">
         <FormItem>
           <Label htmlFor="email" className="mb-2">
-            Email Address
+           {locale === 'de' ? 'E-Mail-Adresse' : 'Email Address'}
           </Label>
           <Input
             id="email"
@@ -97,7 +99,7 @@ export const CreateAccountForm: React.FC = () => {
 
         <FormItem>
           <Label htmlFor="password" className="mb-2">
-            New password
+            {locale === 'de' ? 'Neues Passwort' : 'New Password'}
           </Label>
           <Input
             id="password"
@@ -109,7 +111,7 @@ export const CreateAccountForm: React.FC = () => {
 
         <FormItem>
           <Label htmlFor="passwordConfirm" className="mb-2">
-            Confirm Password
+            {locale === 'de' ? 'Passwort bestätigen' : 'Confirm Password'}
           </Label>
           <Input
             id="passwordConfirm"
@@ -123,13 +125,13 @@ export const CreateAccountForm: React.FC = () => {
         </FormItem>
       </div>
       <Button disabled={loading} type="submit" variant="default">
-        {loading ? 'Processing' : 'Create Account'}
+        {loading ? (locale === 'de' ? 'Wird verarbeitet' : 'Processing') : (locale === 'de' ? 'Konto erstellen' : 'Create Account')}
       </Button>
 
       <div className="prose dark:prose-invert mt-8">
         <p>
-          {'Already have an account? '}
-          <Link href={`/login${allParams}`}>Login</Link>
+          {locale === 'de' ? 'Haben Sie bereits ein Konto?' : 'Already have an account? '}
+          <Link href={`/${locale}/login${allParams}`}>Login</Link>
         </p>
       </div>
     </form>

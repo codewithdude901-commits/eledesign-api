@@ -129,10 +129,12 @@ export interface Config {
   };
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('de' | 'en') | ('de' | 'en')[];
   globals: {
+    'home-page': HomePage;
     header: Header;
     footer: Footer;
   };
   globalsSelect: {
+    'home-page': HomePageSelect<false> | HomePageSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
   };
@@ -1893,6 +1895,74 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-page".
+ */
+export interface HomePage {
+  id: string;
+  hero?: {
+    slides?:
+      | {
+          image: string | Media;
+          title?: string | null;
+          description?: string | null;
+          link?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  pathSelector?: {
+    sub_title?: string | null;
+    title?: string | null;
+    paths?:
+      | {
+          title?: string | null;
+          description?: string | null;
+          image?: (string | null) | Media;
+          list?:
+            | {
+                item?: string | null;
+                icon?: string | null;
+                id?: string | null;
+              }[]
+            | null;
+          link?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  featuredProducts?: {
+    sub_title?: string | null;
+    title?: string | null;
+    description?: string | null;
+    link1?: string | null;
+    products?: (string | Product)[] | null;
+    link2?: string | null;
+  };
+  trustBanner?: {
+    sub_title?: string | null;
+    title?: string | null;
+    description?: string | null;
+    cards?:
+      | {
+          sub_title?: string | null;
+          title?: string | null;
+          description?: string | null;
+          list?:
+            | {
+                item?: string | null;
+                icon?: string | null;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
  */
 export interface Header {
@@ -1938,6 +2008,82 @@ export interface Footer {
     | null;
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-page_select".
+ */
+export interface HomePageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        slides?:
+          | T
+          | {
+              image?: T;
+              title?: T;
+              description?: T;
+              link?: T;
+              id?: T;
+            };
+      };
+  pathSelector?:
+    | T
+    | {
+        sub_title?: T;
+        title?: T;
+        paths?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              image?: T;
+              list?:
+                | T
+                | {
+                    item?: T;
+                    icon?: T;
+                    id?: T;
+                  };
+              link?: T;
+              id?: T;
+            };
+      };
+  featuredProducts?:
+    | T
+    | {
+        sub_title?: T;
+        title?: T;
+        description?: T;
+        link1?: T;
+        products?: T;
+        link2?: T;
+      };
+  trustBanner?:
+    | T
+    | {
+        sub_title?: T;
+        title?: T;
+        description?: T;
+        cards?:
+          | T
+          | {
+              sub_title?: T;
+              title?: T;
+              description?: T;
+              list?:
+                | T
+                | {
+                    item?: T;
+                    icon?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

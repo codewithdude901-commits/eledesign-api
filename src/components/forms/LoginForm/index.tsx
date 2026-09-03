@@ -17,7 +17,11 @@ type FormData = {
   password: string
 }
 
-export const LoginForm: React.FC = () => {
+type Props = {
+  locale: string
+}
+
+export const LoginForm = ({ locale }: Props) => {
   const searchParams = useSearchParams()
   const allParams = searchParams.toString() ? `?${searchParams.toString()}` : ''
   const redirect = useRef(searchParams.get('redirect'))
@@ -36,9 +40,13 @@ export const LoginForm: React.FC = () => {
       try {
         await login(data)
         if (redirect?.current) router.push(redirect.current)
-        else router.push('/account')
+        else router.push(`/${locale}/account`)
       } catch (_) {
-        setError('There was an error with the credentials provided. Please try again.')
+        setError(
+          locale === 'de'
+            ? 'Es gab einen Fehler mit den bereitgestellten Anmeldeinformationen. Bitte versuchen Sie es erneut.'
+            : 'There was an error with the credentials provided. Please try again.',
+        )
       }
     },
     [login, router],
@@ -59,7 +67,7 @@ export const LoginForm: React.FC = () => {
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{locale === 'de' ? 'Passwort' : 'Password'}</Label>
           <Input
             id="password"
             type="password"
@@ -70,20 +78,22 @@ export const LoginForm: React.FC = () => {
 
         <div className="text-primary/70 mb-6 prose prose-a:hover:text-primary dark:prose-invert">
           <p>
-            Forgot your password?{' '}
-            <Link href={`/forgot-password${allParams}`}>Click here to reset it</Link>
+            {locale === 'de' ? 'Haben Sie Ihr Passwort vergessen?' : 'Forgot your password?'}{' '}
+            <Link href={`/forgot-password${allParams}`}>
+              {locale === 'de' ? 'Klicken Sie hier, um es zurückzusetzen' : 'Click here to reset it'}
+            </Link>
           </p>
         </div>
       </div>
 
       <div className="flex gap-4 justify-between">
         <Button asChild variant="outline" size="lg">
-          <Link href={`/create-account${allParams}`} className="grow max-w-[50%]">
-            Create an account
+          <Link href={`/${locale}/create-account${allParams}`} className="grow max-w-[50%]">
+            {locale === 'de' ? 'Konto erstellen' : 'Create an account'}
           </Link>
         </Button>
         <Button className="grow" disabled={isLoading} size="lg" type="submit" variant="default">
-          {isLoading ? 'Processing' : 'Continue'}
+          {isLoading ? (locale === 'de' ? 'Verarbeite' : 'Processing') : (locale === 'de' ? 'Weiter' : 'Continue')}
         </Button>
       </div>
     </form>

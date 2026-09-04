@@ -41,7 +41,7 @@ export const Footer: React.FC = () => {
           {/* Column 1: Brand story & Socials */}
           <div className="lg:col-span-4">
             <div className="flex items-center gap-2 -ml-5 -mt-5">
-              <img src={'/logo.jpeg'} className="w-56 h-auto" />
+              <img src={'/logo.jpeg'} className="w-full max-w-40 md:max-w-52 h-auto  ml-2 md:ml-0 " />
             </div>
 
             <p className={`text-sm leading-relaxed max-w-sm font-medium text-brand-charcoal/90`}>

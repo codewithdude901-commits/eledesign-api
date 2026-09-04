@@ -21,7 +21,7 @@ type Props = {
 }
 
 export default async function ShopPage({ searchParams, params }: Props) {
-  const { q: searchValue, sort, category, maintenance, sunlight } = await searchParams
+  const { q: searchValue, sort, category, maintenance, sunlight, style } = await searchParams
   const { locale } = await params
 
   const payload = await getPayload({
@@ -42,6 +42,7 @@ export default async function ShopPage({ searchParams, params }: Props) {
       common_name: true,
       description: true,
       maintenance_level_garden_set: true,
+      style_tags: true,
     },
     locale,
 
@@ -111,6 +112,16 @@ export default async function ShopPage({ searchParams, params }: Props) {
               {
                 sunlight_garden_set: {
                   contains: sunlight,
+                },
+              },
+            ]
+          : []),
+        // Style
+        ...(style
+          ? [
+              {
+                style_tags: {
+                  contains: style,
                 },
               },
             ]

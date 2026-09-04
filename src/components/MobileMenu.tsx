@@ -48,15 +48,13 @@ export function MobileMenu({ menu, locale }: MobileMenuProps) {
     setIsOpen(false)
   }, [pathname, searchParams])
 
-
-
   return (
     <Sheet onOpenChange={setIsOpen} open={isOpen}>
       <SheetTrigger className="relative flex h-11 w-11 items-center justify-center  text-black transition-colors dark:border-neutral-700 dark:bg-black dark:text-white">
         <MenuIcon className="h-5" />
       </SheetTrigger>
 
-      <SheetContent side="left" className="px-4">
+      <SheetContent side="right" className="px-4">
         <SheetHeader className="px-0 pt-4 pb-0">
           <SheetTitle>Eledesign</SheetTitle>
 

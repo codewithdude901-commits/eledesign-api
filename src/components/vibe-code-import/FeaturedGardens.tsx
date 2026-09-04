@@ -133,7 +133,7 @@ export const FeaturedGardens: React.FC<FeaturedGardensProps> = ({ featuredGarden
                 {/* -------------------------------- */}
 
                 <Link
-                  href={`/${locale === 'en' ? 'en/' : ''}gardens/${garden.slug}`}
+                  href={`/${locale === 'en' ? 'en/' : ''}products/${garden.slug}`}
                   className="block"
                 >
                   <div className="relative aspect-4/3 w-full overflow-hidden bg-brand-charcoal/5">
@@ -159,7 +159,7 @@ export const FeaturedGardens: React.FC<FeaturedGardensProps> = ({ featuredGarden
                 <div className="flex grow flex-col justify-between p-4 pb-6">
                   <div>
                     {/* Product title */}
-                    <Link href={`/${locale === 'en' ? 'en/' : ''}gardens/${garden.slug}`}>
+                    <Link href={`/${locale === 'en' ? 'en/' : ''}products/${garden.slug}`}>
                       <h3 className="text-xl font-bold">{garden.common_name}</h3>
                     </Link>
 
@@ -202,7 +202,7 @@ export const FeaturedGardens: React.FC<FeaturedGardensProps> = ({ featuredGarden
                     )}
 
                     <Link
-                      href={`/${locale === 'en' ? 'en/' : ''}gardens/${garden.slug}`}
+                      href={`/${locale === 'en' ? 'en/' : ''}products/${garden.slug}`}
                       className="group/btn flex items-center gap-1 font-sans font-bold"
                     >
                       <span>{locale === 'de' ? 'Details' : 'Details'}</span>

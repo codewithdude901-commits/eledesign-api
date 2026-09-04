@@ -18,16 +18,18 @@ type FilterListProps = {
   sorting: SortFilterItem[]
   maintenance: FilterOption[]
   sunlight: FilterOption[]
+  style: FilterOption[]
 }
 
-export function FilterList({ sorting, maintenance, sunlight }: FilterListProps) {
+export function FilterList({ sorting, maintenance, sunlight, style }: FilterListProps) {
   return (
     <div className="flex w-full flex-col gap-3 md:flex-row md:items-end lg:justify-end">
       <FilterItemDropdown list={maintenance} param="maintenance" title="Maintenance" />
 
       <FilterItemDropdown list={sunlight} param="sunlight" title="Sunlight" />
+      <FilterItemDropdown list={style} param="style" title="Garden Style" />
 
-      <FilterItemDropdown list={sorting} param="sort" title="Sort by" />
+      {/* <FilterItemDropdown list={sorting} param="sort" title="Sort by" /> */}
     </div>
   )
 }

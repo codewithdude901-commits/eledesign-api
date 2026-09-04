@@ -1,4 +1,4 @@
-import { maintenanceFilters, sunlightFilters, sorting } from '@/lib/constants'
+import { maintenanceFilters, sunlightFilters, sorting, styleFilters  } from '@/lib/constants'
 
 import { FilterList } from '@/components/layout/search/filter'
 import { Search } from '@/components/Search'
@@ -24,6 +24,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
               sorting={sorting}
               maintenance={maintenanceFilters}
               sunlight={sunlightFilters}
+              style={styleFilters}
             />
           </div>
         </div>

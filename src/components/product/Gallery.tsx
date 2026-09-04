@@ -1,9 +1,9 @@
 'use client'
 
-import type { Media as MediaType, Product } from '@/payload-types'
+import type { Product } from '@/payload-types'
 
-import { Media } from '@/components/Media'
 import { GridTileImage } from '@/components/Grid/tile'
+import { Media } from '@/components/Media'
 import { useSearchParams } from 'next/navigation'
 import React, { useEffect } from 'react'
 
@@ -64,7 +64,7 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
 
             return (
               <CarouselItem
-                className="basis-1/5"
+                className="basis-1/3 sm:basis-1/4"
                 key={`${item.image.id}-${i}`}
                 onClick={() => setCurrent(i)}
               >

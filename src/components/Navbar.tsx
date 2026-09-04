@@ -24,13 +24,13 @@ export const Navbar: React.FC = () => {
 
   const navLinksDe = [
     { name: 'Gartenpakete', href: '/gardens' },
-    { name: 'AI-Konzept-Builder', href: '/#' },
+    { name: 'AI-Konzept-Builder', href: '/your-garden' },
     { name: 'Pflanzanleitung', href: '/#' },
   ]
 
   const navLinksEn = [
     { name: 'Gardens', href: '/en/gardens' },
-    { name: 'AI Studio', href: '/#' },
+    { name: 'AI Studio', href: '/en/your-garden' },
     { name: 'Planting Guide', href: '/#' },
   ]
 
@@ -41,12 +41,15 @@ export const Navbar: React.FC = () => {
       <header className="sticky top-0 z-40 w-full glass-nav shadow-sm bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[8vh] flex items-center justify-between">
           {/* Left: Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center overflow-hidden h-full">
             <Link
               href={`/${locale}`}
               className="flex items-center gap-2 group focus:outline-none w-48 h-full "
             >
-              <img src={'/logo.jpeg'} className="w-full h-auto -ml-5" />
+              <img
+                src={'/logo.jpeg'}
+                className="w-full max-w-40 md:max-w-60 h-auto -ml-2 md:-ml-4 "
+              />
             </Link>
           </div>
 
@@ -60,13 +63,13 @@ export const Navbar: React.FC = () => {
                   key={link.name}
                   href={link.href}
                   className={`relative py-1 text-sm font-medium transition-all duration-200  focus:outline-none ${
-                    isActive ? 'font-semibold' : 'text-brand-charcoal'
+                    isActive ? 'font-semibold' : 'text-black/80 '
                   }`}
                 >
                   {link.name}
 
                   <span
-                    className={`absolute bottom-0 left-0 w-full h-0.5 bg-brand-forest scale-x-0 origin-left transition-transform duration-300 ${
+                    className={`absolute bottom-0 left-0 w-full h-0.5 bg-gray-700 scale-x-0 origin-left transition-transform duration-300 ${
                       isActive ? 'scale-x-100' : 'group-hover:scale-x-100'
                     }`}
                   />

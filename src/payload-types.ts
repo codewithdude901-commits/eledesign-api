@@ -352,7 +352,22 @@ export interface Product {
         id?: string | null;
       }[]
     | null;
-  style_tags?: ('pollinator-garden' | 'cottage-garden' | 'modern-minimalist' | 'prairie-garden')[] | null;
+  style_tags?:
+    | (
+        | 'hot-rocky'
+        | 'mediterranean-fragrant'
+        | 'romantic-delicate'
+        | 'elegant-bright'
+        | 'elegant-dark'
+        | 'green-easy'
+        | 'fiery-lively'
+        | 'wild-tall'
+        | 'bright-warm'
+        | 'romantic-shaded'
+        | 'bold-elegant'
+        | 'natural-woodland'
+      )[]
+    | null;
   inventory?: number | null;
   enableVariants?: boolean | null;
   variantTypes?: (string | VariantType)[] | null;

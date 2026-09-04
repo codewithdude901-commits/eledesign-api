@@ -50,3 +50,58 @@ export const sunlightFilters = [
     value: 'shade',
   },
 ]
+
+export const styleFilters = [
+  {
+    title: 'All Styles',
+    value: '',
+  },
+  {
+    title: 'Hot & Rocky',
+    value: 'hot-rocky',
+  },
+  {
+    title: 'Mediterranean & Fragrant',
+    value: 'mediterranean-fragrant',
+  },
+  {
+    title: 'Romantic & Delicate',
+    value: 'romantic-delicate',
+  },
+  {
+    title: 'Elegant & Bright',
+    value: 'elegant-bright',
+  },
+  {
+    title: 'Elegant & Dark',
+    value: 'elegant-dark',
+  },
+  {
+    title: 'Green & Easy-Care',
+    value: 'green-easy',
+  },
+  {
+    title: 'Fiery & Lively',
+    value: 'fiery-lively',
+  },
+  {
+    title: 'Wild & Tall',
+    value: 'wild-tall',
+  },
+  {
+    title: 'Bright & Warm',
+    value: 'bright-warm',
+  },
+  {
+    title: 'Romantic & Shaded',
+    value: 'romantic-shaded',
+  },
+  {
+    title: 'Bold & Elegant',
+    value: 'bold-elegant',
+  },
+  {
+    title: 'Natural & Woodland',
+    value: 'natural-woodland',
+  },
+]

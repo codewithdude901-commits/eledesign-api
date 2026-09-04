@@ -1,9 +1,9 @@
 'use client'
 
-import type { HomePage, Media } from '@/payload-types'
+import type { HomePage } from '@/payload-types'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 type HeroProps = {
   hero?: HomePage['hero']
@@ -133,16 +133,16 @@ export const Hero = ({ hero, locale }: HeroProps) => {
 
   return (
     <section
-      className="relative w-full max-h-[92vh] overflow-hidden bg-brand-charcoal select-none"
+      className="relative w-full overflow-hidden select-none max-h-[92vh]"
       style={{ aspectRatio }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      // onMouseEnter={() => setIsHovered(true)}
+      // onMouseLeave={() => setIsHovered(false)}
     >
       {/* =========================================================
           SLIDES
           ========================================================= */}
 
-      <div className="absolute inset-0 z-0 bg-brand-charcoal">
+      <div className="absolute inset-0 z-0">
         <AnimatePresence initial={false}>
           <motion.div
             key={currentSlide.id ?? currentIndex}
@@ -266,7 +266,9 @@ export const Hero = ({ hero, locale }: HeroProps) => {
             type="button"
             onClick={() => setCurrentIndex(index)}
             className={`h-2 md:h-2.5 rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${
-              index === currentIndex ? 'w-8 bg-white/90' : 'w-2 md:w-2.5 bg-white/35 hover:bg-white/60'
+              index === currentIndex
+                ? 'w-8 bg-white/90'
+                : 'w-2 md:w-2.5 bg-white/35 hover:bg-white/60'
             }`}
             aria-label={`Go to slide ${index + 1}`}
             aria-current={index === currentIndex ? 'true' : undefined}

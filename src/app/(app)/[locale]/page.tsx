@@ -1,3 +1,4 @@
+import { NeighborbriteEmbed } from '@/components/NeighborbriteEmbed'
 import { FeaturedGardens } from '@/components/vibe-code-import/FeaturedGardens'
 import { Hero } from '@/components/vibe-code-import/Hero'
 import { PathSelector } from '@/components/vibe-code-import/PathSelector'
@@ -25,11 +26,11 @@ export default async function Home({ params }: Props) {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* The selected language is: {locale} */}
       <Hero hero={homePageData.hero} locale={locale} />
       <PathSelector pathSelector={homePageData.pathSelector} locale={locale} />
       <FeaturedGardens featuredGardens={homePageData.featuredProducts} locale={locale} />
       <TrustBanner trustBanner={homePageData.trustBanner} locale={locale} />
+
     </div>
   )
 }

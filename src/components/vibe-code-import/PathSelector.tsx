@@ -3,6 +3,7 @@
 import { HomePage } from '@/payload-types'
 import { motion } from 'framer-motion'
 import {
+  ArrowLeftRight,
   ArrowRight,
   CheckCircle2,
   ShieldCheck,
@@ -11,10 +12,9 @@ import {
   Upload,
   Wand2,
   Zap,
-  ArrowLeftRight,
 } from 'lucide-react'
 import Link from 'next/link'
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 type PathSelectorProps = {
   pathSelector?: HomePage['pathSelector']
@@ -80,7 +80,6 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
   return (
     <section className="relative py-20 lg:py-28 overflow-hidden">
       {/* Decorative Subtle Ambient Blobs */}
-      <div className="absolute top-10 left-10 w-72 h-72 bg-brand-forest/5  blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
@@ -120,9 +119,9 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
             {/* Top Image Banner */}
             <div className="relative h-64 sm:h-80 lg:h-72 w-full overflow-hidden">
               <img
-                src="/garden_3.jpeg"
+                src="/readymade-concepts.jpg"
                 alt="Readymade Outdoor Garden Concept"
-                className="w-full h-full object-cover object-bottom"
+                className="w-full h-full object-cover"
               />
             </div>
 
@@ -167,7 +166,7 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
               {/* Card Actions */}
               <div className="pt-4 border-t border-brand-charcoal/10 flex flex-col sm:flex-row items-center gap-3">
                 <Link
-                  href="/gardens"
+                  href={`/${locale}/gardens`}
                   className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-green-700 text-white font-bold  shadow-md transition-all hover:scale-[1] active:scale-[0.99] text-center sm:text-left"
                 >
                   <span>
@@ -197,9 +196,9 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
               {/* BEFORE IMAGE (Background) */}
               <div className="absolute inset-0 w-full h-full">
                 <img
-                  src="/garden1before.png"
+                  src="/before1.jpg"
                   alt="Bare concrete balcony before transformation"
-                  className="w-full h-full object-cover pointer-events-none"
+                  className="w-full h-full object-cover object-top pointer-events-none"
                 />
               </div>
 
@@ -209,9 +208,9 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
                 style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
               >
                 <img
-                  src="/garden1.png"
+                  src="/after1.jpg"
                   alt="Lush green garden balcony after transformation"
-                  className="w-full h-full object-cover pointer-events-none absolute inset-0"
+                  className="w-full h-full object-cover object-top pointer-events-none absolute inset-0"
                 />
               </div>
 
@@ -275,7 +274,7 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
               {/* Card Actions */}
               <div className="pt-4 border-t border-brand-charcoal/10 flex flex-col sm:flex-row items-center gap-3">
                 <Link
-                  href="/ai-canvas"
+                  href="/#"
                   className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-black/80 text-white font-bold shadow-md transition-all hover:scale-[1] active:scale-[0.99] text-center sm:text-left"
                 >
                   <span>

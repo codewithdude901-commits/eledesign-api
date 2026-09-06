@@ -54,7 +54,7 @@ export function ProductDescription({ product }: { product: Product }) {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <h1 className="text-2xl font-medium">{product.title}</h1>
+        <h1 className="text-2xl font-medium">{product.common_name}</h1>
 
         <div className="uppercase font-mono">
           {hasVariants ? (

@@ -11,7 +11,7 @@ import { CreateAddressModal } from '@/components/addresses/CreateAddressModal'
 
 type Props = {
   params: Promise<{
-    locale: string
+    locale: 'de' | 'en'
   }>
 }
 
@@ -53,7 +53,7 @@ export default async function AddressesPage({ params }: Props) {
 
   return (
     <>
-      <div className="border p-8 rounded-lg bg-primary-foreground">
+      <div className="border p-8  bg-primary-foreground">
         <h1 className="text-3xl font-medium mb-8">{locale === 'de' ? 'Adressen' : 'Addresses'}</h1>
 
         <div className="mb-8">

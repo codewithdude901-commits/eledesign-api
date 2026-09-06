@@ -100,7 +100,7 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight text-stone-900"
           >
             {pathSelector?.title}
           </motion.h2>
@@ -127,7 +127,7 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
 
             {/* Card Content */}
             <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-4">
-              <h3 className="text-2xl sm:text-3xl font-extrabold drop-shadow-sm">
+              <h3 className="text-2xl sm:text-3xl font-extrabold drop-shadow-sm text-green-800">
                 {pathSelector?.paths && pathSelector?.paths[0]?.title}
               </h3>
 
@@ -196,7 +196,8 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
               {/* BEFORE IMAGE (Background) */}
               <div className="absolute inset-0 w-full h-full">
                 <img
-                  src="/before1.jpg"
+                  src="/after1.jpg"
+
                   alt="Bare concrete balcony before transformation"
                   className="w-full h-full object-cover object-top pointer-events-none"
                 />
@@ -208,7 +209,8 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
                 style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
               >
                 <img
-                  src="/after1.jpg"
+                  src="/before1.jpg"
+
                   alt="Lush green garden balcony after transformation"
                   className="w-full h-full object-cover object-top pointer-events-none absolute inset-0"
                 />
@@ -232,7 +234,7 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
             <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-4">
               {/* Floating AI Visual Mockup Tag */}
               <div className=" flex items-end justify-between">
-                <h3 className="text-2xl sm:text-3xl font-extrabold  mt-1 drop-shadow-sm">
+                <h3 className="text-2xl sm:text-3xl font-extrabold  mt-1 drop-shadow-sm text-sky-800">
                   {pathSelector?.paths && pathSelector?.paths[1]?.title}
                 </h3>
               </div>
@@ -274,8 +276,8 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
               {/* Card Actions */}
               <div className="pt-4 border-t border-brand-charcoal/10 flex flex-col sm:flex-row items-center gap-3">
                 <Link
-                  href="/#"
-                  className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-black/80 text-white font-bold shadow-md transition-all hover:scale-[1] active:scale-[0.99] text-center sm:text-left"
+                  href={`/${locale}/your-garden`}
+                  className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-sky-700 text-white font-bold shadow-md transition-all hover:scale-[1] active:scale-[0.99] text-center sm:text-left"
                 >
                   <span>
                     {locale === 'de'

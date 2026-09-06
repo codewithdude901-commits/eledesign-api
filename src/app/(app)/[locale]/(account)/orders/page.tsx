@@ -48,7 +48,7 @@ export default async function Orders({ params }: Props) {
 
   return (
     <>
-      <div className="border p-8 rounded-lg bg-primary-foreground w-full">
+      <div className="border p-8  bg-primary-foreground w-full">
         <h1 className="text-3xl font-medium mb-8">{locale === 'de' ? 'Bestellungen' : 'Orders'}</h1>
         {(!orders || !Array.isArray(orders) || orders?.length === 0) && (
           <p className="">

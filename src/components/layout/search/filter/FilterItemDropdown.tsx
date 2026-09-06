@@ -11,9 +11,10 @@ type Props = {
   list: SortFilterItem[] | FilterOption[]
   title: string
   param: string
+  locale: 'de' | 'en'
 }
 
-export function FilterItemDropdown({ list, title, param }: Props) {
+export function FilterItemDropdown({ list, title, param, locale }: Props) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -92,7 +93,7 @@ export function FilterItemDropdown({ list, title, param }: Props) {
         <span className="flex items-center gap-2">
           <span className="text-brand-charcoal/50">{title}:</span>
 
-          <span className="font-medium">{activeTitle}</span>
+          <span className="font-medium">{locale === 'de' ? activeTitle.de : activeTitle.en}</span>
         </span>
 
         <ChevronDownIcon
@@ -132,7 +133,7 @@ export function FilterItemDropdown({ list, title, param }: Props) {
                   }
                 `}
               >
-                {item.title}
+                {locale === 'de' ? item.title.de : item.title.en}
               </button>
             )
           })}

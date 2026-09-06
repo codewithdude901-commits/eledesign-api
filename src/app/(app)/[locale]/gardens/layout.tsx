@@ -1,11 +1,19 @@
-import { maintenanceFilters, sunlightFilters, sorting, styleFilters  } from '@/lib/constants'
+import { maintenanceFilters, sunlightFilters, sorting, styleFilters } from '@/lib/constants'
 
 import { FilterList } from '@/components/layout/search/filter'
 import { Search } from '@/components/Search'
 
 import React, { Suspense } from 'react'
 
-export default function ShopLayout({ children }: { children: React.ReactNode }) {
+type Args = {
+  children: React.ReactNode
+  params: Promise<{
+    locale: 'de' | 'en'
+  }>
+}
+
+export default async function ShopLayout({ children, params }: Args) {
+  const { locale } = await params
   return (
     <Suspense fallback={null}>
       <div className=" my-16 pb-4 max-w-7xl mx-auto px-4 sm:px-6 ">
@@ -25,6 +33,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
               maintenance={maintenanceFilters}
               sunlight={sunlightFilters}
               style={styleFilters}
+              locale={locale}
             />
           </div>
         </div>

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import type { Product } from '@/payload-types'
 
 import { createUrl } from '@/utilities/createUrl'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 
 export function VariantSelector({ product }: { product: Product }) {
@@ -14,6 +14,9 @@ export function VariantSelector({ product }: { product: Product }) {
   const variants = product.variants?.docs
   const variantTypes = product.variantTypes
   const hasVariants = Boolean(product.enableVariants && variants?.length && variantTypes?.length)
+  const params = useParams<{ locale: 'de' | 'en' }>()
+
+  const locale = params.locale
 
   if (!hasVariants) {
     return null
@@ -95,12 +98,12 @@ export function VariantSelector({ product }: { product: Product }) {
 
               return (
                 <Button
-                  variant={isActive ? 'default' : 'ghost'}
+                  variant={isActive ? 'default' : 'outline'}
                   aria-disabled={!isAvailableForSale}
                   // className={clsx('px-2', {
                   //   'bg-primary/5 text-primary': isActive,
                   // })}
-                  className=""
+                  className="rounded-none"
                   disabled={!isAvailableForSale}
                   key={option.id}
                   onClick={() => {
@@ -108,7 +111,7 @@ export function VariantSelector({ product }: { product: Product }) {
                       scroll: false,
                     })
                   }}
-              
+
                   title={`${option.label} ${!isAvailableForSale ? ' (Out of Stock)' : ''}`}
                 >
                   {option.label}

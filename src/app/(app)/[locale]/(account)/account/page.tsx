@@ -54,14 +54,14 @@ export default async function AccountPage({ params }: Props) {
 
   return (
     <>
-      <div className="border p-8 rounded-lg bg-primary-foreground">
+      <div className="border p-8  bg-primary-foreground">
         <h1 className="text-3xl font-medium mb-8">
           {locale === 'de' ? 'Kontoeinstellungen' : 'Account settings'}
         </h1>
         <AccountForm locale={locale} />
       </div>
 
-      <div className=" border p-8 rounded-lg bg-primary-foreground">
+      <div className=" border p-8  bg-primary-foreground">
         <h2 className="text-3xl font-medium mb-8">
           {locale === 'de' ? 'Letzte Bestellungen' : 'Recent Orders'}
         </h2>
@@ -92,7 +92,7 @@ export default async function AccountPage({ params }: Props) {
           </ul>
         )}
 
-        <Button asChild variant="default">
+        <Button asChild variant="default" className='rounded-none'>
           <Link href="/orders">
             {locale === 'de' ? 'Alle Bestellungen ansehen' : 'View all orders'}
           </Link>

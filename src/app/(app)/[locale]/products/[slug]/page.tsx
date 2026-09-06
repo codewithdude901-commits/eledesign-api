@@ -124,13 +124,13 @@ export default async function ProductPage({ params }: Args) {
         type="application/ld+json"
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6  pt-8 pb-8">
-        <Button asChild variant="secondary" className="mb-4">
+        <Button asChild variant="secondary" className="mb-4 rounded-none">
           <Link href={`/${locale}/gardens`}>
             <ChevronLeftIcon />
-            All products
+            {locale === 'de' ? 'Alle Produkte' : 'All products'}
           </Link>
         </Button>
-        <div className="flex flex-col gap-12 rounded-lg border p-8 md:py-12 lg:flex-row lg:gap-8 bg-primary-foreground">
+        <div className="flex flex-col gap-12 rounded-none border p-6  sm:p-8 md:py-12 lg:flex-row lg:gap-8 bg-primary-foreground">
           <div className="h-full w-full basis-full lg:basis-1/2">
             <Suspense
               fallback={
@@ -146,7 +146,6 @@ export default async function ProductPage({ params }: Args) {
           </div>
         </div>
       </div>
-
 
       {relatedProducts.length ? (
         <div className="container">

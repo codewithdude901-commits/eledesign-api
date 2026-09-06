@@ -23,7 +23,7 @@ import { DeleteItemButton } from './DeleteItemButton'
 import { EditItemQuantityButton } from './EditItemQuantityButton'
 import { OpenCartButton } from './OpenCart'
 
-export function CartModal() {
+export function CartModal({ locale }: { locale: 'de' | 'en' }) {
   const { cart } = useCart()
   // const [isOpen, setIsOpen] = useState(false)
   const { isCartOpen, openCart, closeCart } = useCartUI()
@@ -57,15 +57,21 @@ export function CartModal() {
 
       <SheetContent className="flex flex-col">
         <SheetHeader>
-          <SheetTitle>My Cart</SheetTitle>
+          <SheetTitle>{locale === 'de' ? 'Mein Warenkorb' : 'My Cart'}</SheetTitle>
 
-          <SheetDescription>Manage your cart here, add items to view the total.</SheetDescription>
+          <SheetDescription className="text-stone-900">
+            {locale === 'de'
+              ? 'Verwalten Sie hier Ihren Warenkorb; fügen Sie Artikel hinzu, um die Gesamtsumme zu sehen.'
+              : 'Manage your cart here, add items to view the total.'}
+          </SheetDescription>
         </SheetHeader>
 
         {!cart || cart?.items?.length === 0 ? (
           <div className="text-center flex flex-col items-center gap-2">
             <ShoppingCart className="h-16" />
-            <p className="text-center text-2xl font-bold">Your cart is empty.</p>
+            <p className="text-center text-2xl font-bold">
+              {locale === 'de' ? 'Ihr Warenkorb ist leer.' : 'Your cart is empty.'}
+            </p>
           </div>
         ) : (
           <div className="grow flex px-4">
@@ -126,7 +132,7 @@ export function CartModal() {
                           className="z-30 flex flex-row space-x-4"
                           href={`/products/${(item.product as Product)?.slug}`}
                         >
-                          <div className="relative h-16 w-16 cursor-pointer overflow-hidden rounded-md border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
+                          <div className="relative h-16 w-16 cursor-pointer overflow-hidden border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
                             {image?.url && (
                               <Image
                                 alt={image?.alt || product?.title || ''}
@@ -139,9 +145,9 @@ export function CartModal() {
                           </div>
 
                           <div className="flex flex-1 flex-col text-base">
-                            <span className="leading-tight">{product?.title}</span>
+                            <span className="leading-tight text-sm">{product?.common_name}</span>
                             {isVariant && variant ? (
-                              <p className="text-sm text-neutral-500 dark:text-neutral-400 capitalize">
+                              <p className="text-xs text-neutral-700 dark:text-neutral-500 capitalize">
                                 {variant.options
                                   ?.map((option) => {
                                     if (typeof option === 'object') return option.label
@@ -159,7 +165,7 @@ export function CartModal() {
                               className="flex justify-end space-y-2 text-right text-sm"
                             />
                           )}
-                          <div className="ml-auto flex h-9 flex-row items-center rounded-lg border">
+                          <div className="ml-auto flex h-9 flex-row items-center border">
                             <EditItemQuantityButton item={item} type="minus" />
                             <p className="w-6 text-center">
                               <span className="w-full text-sm">{item.quantity}</span>
@@ -176,8 +182,8 @@ export function CartModal() {
               <div className="px-4">
                 <div className="py-4 text-sm text-neutral-500 dark:text-neutral-400">
                   {typeof cart?.subtotal === 'number' && (
-                    <div className="mb-3 flex items-center justify-between border-b border-neutral-200 pb-1 pt-1 dark:border-neutral-700">
-                      <p>Total</p>
+                    <div className="mb-3 flex items-center justify-between border-b border-neutral-300 pb-1 pt-1 dark:border-neutral-700 text-black">
+                      <p>{locale === 'de' ? 'Gesamt' : 'Total'}</p>
                       <Price
                         amount={cart?.subtotal}
                         className="text-right text-base text-black dark:text-white"
@@ -185,9 +191,9 @@ export function CartModal() {
                     </div>
                   )}
 
-                  <Button asChild>
-                    <Link className="w-full" href="/checkout">
-                      Proceed to Checkout
+                  <Button asChild className="bg-emerald-600 hover:bg-emerald-600/90">
+                    <Link className="w-full " href="/checkout">
+                      {locale === 'de' ? 'Zur Kasse gehen' : 'Proceed to Checkout'}
                     </Link>
                   </Button>
                 </div>

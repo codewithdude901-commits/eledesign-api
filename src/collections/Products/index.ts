@@ -42,6 +42,8 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     maintenance_level_garden_set: true,
     priceInEUR: true,
     common_name: true,
+    botanical_name_full: true,
+    variants: true,
   },
 
   fields: [

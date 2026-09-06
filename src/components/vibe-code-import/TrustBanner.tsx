@@ -52,7 +52,7 @@ export const TrustBanner: React.FC<TrustBannerProps> = ({ trustBanner, locale })
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-brand-charcoal tracking-tight leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-brand-charcoal tracking-tight leading-tight text-stone-900"
           >
             {trustBanner?.title}
           </motion.h2>

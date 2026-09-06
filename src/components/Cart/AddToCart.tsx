@@ -5,7 +5,7 @@ import type { Product, Variant } from '@/payload-types'
 import { useCartUI } from '@/providers/CartUIContext'
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import clsx from 'clsx'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 
@@ -17,6 +17,9 @@ export function AddToCart({ product }: Props) {
   const { addItem, cart, isLoading, refreshCart } = useCart()
   const { openCart } = useCartUI()
 
+  const params = useParams<{ locale: 'de' | 'en' }>()
+
+  const locale = params.locale
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -264,13 +267,13 @@ export function AddToCart({ product }: Props) {
       aria-label="Add to cart"
       variant="outline"
       className={clsx({
-        'hover:opacity-90': true,
+        'rounded-none hover:opacity-90 bg-emerald-600 hover:bg-emerald-600 text-white min-w-40': true,
       })}
       disabled={disabled || isLoading}
       onClick={handleAddToCart}
       type="submit"
     >
-      Add To Cart
+      {locale === 'de' ? 'In den Warenkorb legen' : 'Add To Cart'}
     </Button>
   )
 }

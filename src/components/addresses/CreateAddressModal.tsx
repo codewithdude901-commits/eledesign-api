@@ -54,12 +54,12 @@ export const CreateAddressModal: React.FC<Props> = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild disabled={disabled}>
-        <Button variant={'outline'}>{buttonText}</Button>
+        <Button variant={'outline'} className='rounded-none'>{buttonText}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{modalTitle}</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className='text-stone-800'>
             {locale === 'de' ? 'Diese Adresse wird mit Ihrem Konto verknüpft.' : 'This address will be connected to your account.'}
           </DialogDescription>
         </DialogHeader>

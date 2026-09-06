@@ -1,5 +1,6 @@
 'use client'
 import { Product, Variant } from '@/payload-types'
+import { BadgeAlert } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useMemo } from 'react'
 
@@ -51,8 +52,13 @@ export const StockIndicator: React.FC<Props> = ({ product }) => {
   }
 
   return (
-    <div className="uppercase font-mono text-sm font-medium text-gray-600">
-      {stockQuantity < 15 && stockQuantity > 0 && <p>Only {stockQuantity} left in stock</p>}
+    <div className="uppercase text-sm font-medium text-orange-600">
+      {stockQuantity < 15 && stockQuantity > 0 && (
+        <p className=" flex items-center">
+          <BadgeAlert className="mr-2 size-4.5" />
+          Only {stockQuantity} left in stock
+        </p>
+      )}
       {(stockQuantity === 0 || !stockQuantity) && <p>Out of stock</p>}
     </div>
   )

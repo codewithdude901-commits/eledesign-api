@@ -1,107 +1,123 @@
 export type SortFilterItem = {
   reverse: boolean
   slug: null | string
-  title: string
+  title: { de: string; en: string }
 }
 
 export const defaultSort: SortFilterItem = {
   slug: null,
   reverse: false,
-  title: 'Alphabetic A-Z',
+
+  title: { de: 'Alphabetisch A–Z', en: 'Alphabetic A-Z' },
 }
 
 export const sorting: SortFilterItem[] = [
   defaultSort,
-  { slug: '-createdAt', reverse: true, title: 'Latest arrivals' },
-  { slug: 'priceInEUR', reverse: false, title: 'Price: Low to high' }, // asc
-  { slug: '-priceInEUR', reverse: true, title: 'Price: High to low' },
+  {
+    slug: '-createdAt',
+    reverse: true,
+
+    title: { de: 'Neuheiten', en: 'Latest arrivals' },
+  },
+  {
+    slug: 'priceInEUR',
+    reverse: false,
+
+    title: { de: 'Niedrig bis hoch', en: 'Low to high' },
+  }, // asc
+  {
+    slug: '-priceInEUR',
+    reverse: true,
+
+    title: { de: 'Von hoch nach niedrig', en: 'High to low' },
+  },
 ]
 
 export const maintenanceFilters = [
   {
-    title: 'All',
+    title: { de: 'Alle', en: 'All' },
     value: '',
   },
   {
-    title: 'Low',
+    title: { de: 'Niedrig', en: 'Low' },
     value: 'low',
   },
   {
-    title: 'I Love Gardening',
+    title: { de: 'Ich liebe die Gartenarbeit.', en: 'I Love Gardening' },
     value: 'high',
   },
 ]
 
 export const sunlightFilters = [
   {
-    title: 'All',
+    title: { de: 'Alle', en: 'All' },
     value: '',
   },
   {
-    title: 'Full Sun',
+    title: { de: 'Volle Sonne', en: 'Full sun' },
     value: 'full_sun',
   },
   {
-    title: 'Partial Sun',
+    title: { de: 'Halbschatten', en: 'Partial Sun' },
     value: 'partial_sun',
   },
   {
-    title: 'Full Shade',
+    title: { de: 'Vollschatten', en: 'Full Shade' },
     value: 'shade',
   },
 ]
 
 export const styleFilters = [
   {
-    title: 'All Styles',
+    title: { de: 'Alle', en: 'All' },
     value: '',
   },
   {
-    title: 'Hot & Rocky',
+    title: { de: 'Heiß & Steinig', en: 'Hot & Rocky' },
     value: 'hot-rocky',
   },
   {
-    title: 'Mediterranean & Fragrant',
+    title: { de: 'Mediterran & Duftend', en: 'Mediterranean & Fragrant' },
     value: 'mediterranean-fragrant',
   },
   {
-    title: 'Romantic & Delicate',
+    title: { de: 'Romantisch & Zart', en: 'Romantic & Delicate' },
     value: 'romantic-delicate',
   },
   {
-    title: 'Elegant & Bright',
+    title: { de: 'Elegant & weiß', en: 'Elegant & Bright' },
     value: 'elegant-bright',
   },
   {
-    title: 'Elegant & Dark',
+    title: { de: 'Elegant & Dunkel', en: 'Elegant & Dark' },
     value: 'elegant-dark',
   },
   {
-    title: 'Green & Easy-Care',
+    title: { de: 'Grün & Pflegeleicht', en: 'Green & Easy-Care' },
     value: 'green-easy',
   },
   {
-    title: 'Fiery & Lively',
+    title: { de: 'Feurig & Lebendig', en: 'Fiery & Lively' },
     value: 'fiery-lively',
   },
   {
-    title: 'Wild & Tall',
+    title: { de: 'Wild & Hoch', en: 'Wild & Tall' },
     value: 'wild-tall',
   },
   {
-    title: 'Bright & Warm',
+    title: { de: 'Leuchtend & Warm', en: 'Bright & Warm' },
     value: 'bright-warm',
   },
   {
-    title: 'Romantic & Shaded',
+    title: { de: 'Romantisch & Schattig', en: 'Romantic & Shaded' },
     value: 'romantic-shaded',
   },
   {
-    title: 'Bold & Elegant',
+    title: { de: 'Blattstark & Elegant', en: 'Bold & Elegant' },
     value: 'bold-elegant',
   },
   {
-    title: 'Natural & Woodland',
+    title: { de: 'Natürlich & Waldig', en: 'Natural & Woodland' },
     value: 'natural-woodland',
   },
 ]

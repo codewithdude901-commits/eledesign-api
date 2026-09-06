@@ -10,7 +10,7 @@ export function OpenCartButton({
 }) {
   return (
     <button
-      className="relative p-2.5 rounded-full text-black  hover:bg-black/5 transition-all duration-200 focus:outline-none flex items-center justify-center"
+      className="relative p-2.5 rounded-full text-black  hover:bg-black/5 transition-all duration-200 focus:outline-none flex items-center justify-center cursor-pointer"
       aria-label="Shopping Cart"
       {...rest}
     >

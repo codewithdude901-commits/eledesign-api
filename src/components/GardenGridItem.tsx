@@ -88,10 +88,14 @@ export const GardenGridItem: React.FC<Props> = ({ garden, locale }) => {
           <div className="mt-4 flex flex-wrap gap-2">
             {garden.maintenance_level_garden_set && (
               <span className="border border-brand-charcoal/10 bg-emerald-200/50 px-2.5 py-1 text-xs font-medium capitalize">
-                {locale === 'de' ? 'Pflegebedarf' : 'Maintenance'} :{' '}
+                {locale === 'de' ? 'Pflegebedarf' : 'Maintenance'}:{' '}
                 {garden.maintenance_level_garden_set === 'high'
-                  ? 'I Love Gardening'
-                  : garden.maintenance_level_garden_set}
+                  ? locale === 'de'
+                    ? 'Ich liebe die Gartenarbeit.'
+                    : 'I Love Gardening'
+                  : locale === 'de'
+                    ? 'Niedrig'
+                    : 'Low'}
               </span>
             )}
 

@@ -1,11 +1,6 @@
 'use client'
-import React, { useCallback } from 'react'
-import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useAddresses } from '@payloadcms/plugin-ecommerce/client/react'
-import { defaultCountries as supportedCountries } from '@payloadcms/plugin-ecommerce/client/react'
-import { Address, Config } from '@/payload-types'
 import {
   Select,
   SelectContent,
@@ -13,12 +8,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Address, Config } from '@/payload-types'
+import { defaultCountries as supportedCountries, useAddresses } from '@payloadcms/plugin-ecommerce/client/react'
+import React, { useCallback } from 'react'
+import { useForm } from 'react-hook-form'
 
-import { titles } from './constants'
-import { Button } from '@/components/ui/button'
-import { deepMergeSimple } from 'payload/shared'
 import { FormError } from '@/components/forms/FormError'
 import { FormItem } from '@/components/forms/FormItem'
+import { Button } from '@/components/ui/button'
+import { deepMergeSimple } from 'payload/shared'
+import { titles } from './constants'
 
 type AddressFormValues = {
   title?: string | null
@@ -84,8 +83,10 @@ export const AddressForm: React.FC<Props> = ({
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="flex flex-col gap-4 mb-8">
         <div className="flex flex-col md:flex-row gap-4">
-          <FormItem className="shrink">
-            <Label htmlFor="title">Title</Label>
+          <FormItem className="shrink ">
+            <Label htmlFor="title" className="text-stone-800">
+              Title
+            </Label>
 
             <Select
               {...register('title')}
@@ -93,13 +94,14 @@ export const AddressForm: React.FC<Props> = ({
                 setValue('title', value, { shouldValidate: true })
               }}
               defaultValue={initialData?.title || ''}
+              
             >
-              <SelectTrigger id="title">
+              <SelectTrigger id="title" className='rounded-none'>
                 <SelectValue placeholder="Title" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className='rounded-none'>
                 {titles.map((title) => (
-                  <SelectItem key={title} value={title}>
+                  <SelectItem key={title} value={title} >
                     {title}
                   </SelectItem>
                 ))}
@@ -108,82 +110,109 @@ export const AddressForm: React.FC<Props> = ({
             {errors.title && <FormError message={errors.title.message} />}
           </FormItem>
 
-          <FormItem>
-            <Label htmlFor="firstName">First name*</Label>
+          <FormItem >
+            <Label htmlFor="firstName" className="text-stone-800">
+              First name*
+            </Label>
             <Input
               id="firstName"
               autoComplete="given-name"
               {...register('firstName', { required: 'First name is required.' })}
+              className='rounded-none'
             />
             {errors.firstName && <FormError message={errors.firstName.message} />}
           </FormItem>
 
           <FormItem>
-            <Label htmlFor="lastName">Last name*</Label>
+            <Label htmlFor="lastName" className="text-stone-800">
+              Last name*
+            </Label>
             <Input
               autoComplete="family-name"
               id="lastName"
               {...register('lastName', { required: 'Last name is required.' })}
+              className='rounded-none'
             />
             {errors.lastName && <FormError message={errors.lastName.message} />}
           </FormItem>
         </div>
 
         <FormItem>
-          <Label htmlFor="phone">Phone</Label>
-          <Input type="tel" id="phone" autoComplete="mobile tel" {...register('phone')} />
+          <Label htmlFor="phone" className="text-stone-800">
+            Phone
+          </Label>
+          <Input type="tel" id="phone" autoComplete="mobile tel" {...register('phone')} className='rounded-none' />
           {errors.phone && <FormError message={errors.phone.message} />}
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="company">Company</Label>
-          <Input id="company" autoComplete="organization" {...register('company')} />
+          <Label htmlFor="company" className="text-stone-800">
+            Company
+          </Label>
+          <Input id="company" autoComplete="organization" {...register('company')} 
+          className='rounded-none'/>
           {errors.company && <FormError message={errors.company.message} />}
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="addressLine1">Address line 1*</Label>
+          <Label htmlFor="addressLine1" className="text-stone-800">
+            Address line 1*
+          </Label>
           <Input
             id="addressLine1"
             autoComplete="address-line1"
             {...register('addressLine1', { required: 'Address line 1 is required.' })}
+            className='rounded-none'
           />
           {errors.addressLine1 && <FormError message={errors.addressLine1.message} />}
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="addressLine2">Address line 2</Label>
-          <Input id="addressLine2" autoComplete="address-line2" {...register('addressLine2')} />
+          <Label htmlFor="addressLine2" className="text-stone-800">
+            Address line 2
+          </Label>
+          <Input id="addressLine2" autoComplete="address-line2" {...register('addressLine2')} className='rounded-none'/>
           {errors.addressLine2 && <FormError message={errors.addressLine2.message} />}
+          
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="city">City*</Label>
+          <Label htmlFor="city" className="text-stone-800">
+            City*
+          </Label>
           <Input
             id="city"
             autoComplete="address-level2"
+            className='rounded-none'
             {...register('city', { required: 'City is required.' })}
           />
           {errors.city && <FormError message={errors.city.message} />}
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="state">State</Label>
-          <Input id="state" autoComplete="address-level1" {...register('state')} />
+          <Label htmlFor="state" className="text-stone-800">
+            State
+          </Label>
+          <Input id="state" autoComplete="address-level1" className='rounded-none' {...register('state')} />
           {errors.state && <FormError message={errors.state.message} />}
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="postalCode">Zip Code*</Label>
+          <Label htmlFor="postalCode" className="text-stone-800">
+            Zip Code*
+          </Label>
           <Input
             id="postalCode"
             {...register('postalCode', { required: 'Postal code is required.' })}
+            className='rounded-none'
           />
           {errors.postalCode && <FormError message={errors.postalCode.message} />}
         </FormItem>
 
         <FormItem>
-          <Label htmlFor="country">Country*</Label>
+          <Label htmlFor="country" className="text-stone-800">
+            Country*
+          </Label>
 
           <Select
             {...register('country', {
@@ -195,10 +224,10 @@ export const AddressForm: React.FC<Props> = ({
             required
             defaultValue={initialData?.country || ''}
           >
-            <SelectTrigger id="country" className="w-full">
+            <SelectTrigger id="country" className="w-full rounded-none" >
               <SelectValue placeholder="Country" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className='rounded-none'> 
               {supportedCountries.map((country) => {
                 const value = typeof country === 'string' ? country : country.value
                 const label =

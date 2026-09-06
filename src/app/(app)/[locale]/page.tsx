@@ -22,7 +22,7 @@ export default async function Home({ params }: Props) {
     depth: 2,
   })
 
-  console.log('featuredGardens', homePageData.featuredProducts)
+  // console.log('featuredGardens', homePageData.featuredProducts)
 
   return (
     <div className="flex flex-col min-h-screen">

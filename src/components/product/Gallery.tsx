@@ -53,7 +53,7 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
         <Media
           resource={gallery[current].image}
           className="w-full"
-          imgClassName="w-full rounded-lg"
+          imgClassName="w-full rounded-none"
         />
       </div>
 
@@ -64,7 +64,7 @@ export const Gallery: React.FC<Props> = ({ gallery }) => {
 
             return (
               <CarouselItem
-                className="basis-1/3 sm:basis-1/4"
+                className="basis-1/3 sm:basis-1/4 "
                 key={`${item.image.id}-${i}`}
                 onClick={() => setCurrent(i)}
               >

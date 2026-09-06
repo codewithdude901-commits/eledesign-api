@@ -77,7 +77,7 @@ export const FeaturedGardens: React.FC<FeaturedGardensProps> = ({ featuredGarden
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: 0.1 }}
-                className="text-3xl font-extrabold leading-tight tracking-tight text-brand-charcoal sm:text-4xl md:text-5xl"
+                className="text-3xl font-extrabold leading-tight tracking-tight text-brand-charcoal sm:text-4xl md:text-5xl text-stone-900"
               >
                 {featuredGardens.title}
               </motion.h2>

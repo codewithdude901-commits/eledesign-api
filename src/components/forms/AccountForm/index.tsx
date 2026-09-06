@@ -116,6 +116,7 @@ export const AccountForm: React.FC<{ locale: string }> = ({ locale }) => {
               </Label>
               <Input
                 id="email"
+                className='rounded-none'
                 {...register('email', { required: 'Please provide an email.' })}
                 type="email"
               />
@@ -128,6 +129,7 @@ export const AccountForm: React.FC<{ locale: string }> = ({ locale }) => {
               </Label>
               <Input
                 id="name"
+                className='rounded-none'
                 {...register('name', { required: 'Please provide a name.' })}
                 type="text"
               />
@@ -143,7 +145,7 @@ export const AccountForm: React.FC<{ locale: string }> = ({ locale }) => {
                 ? 'Ändern Sie Ihr Passwort unten, oder '
                 : 'Change your password below, or '}
               <Button
-                className="px-0 text-inherit underline hover:cursor-pointer"
+                className=" px-0 text-inherit underline hover:cursor-pointer"
                 onClick={() => setChangePassword(!changePassword)}
                 type="button"
                 variant="link"
@@ -161,6 +163,7 @@ export const AccountForm: React.FC<{ locale: string }> = ({ locale }) => {
               </Label>
               <Input
                 id="password"
+                className='rounded-none'
                 {...register('password', { required: 'Please provide a new password.' })}
                 type="password"
               />
@@ -173,6 +176,7 @@ export const AccountForm: React.FC<{ locale: string }> = ({ locale }) => {
               </Label>
               <Input
                 id="passwordConfirm"
+                className='rounded-none'
                 {...register('passwordConfirm', {
                   required: 'Please confirm your new password.',
                   validate: (value) => value === password.current || 'The passwords do not match',
@@ -184,7 +188,7 @@ export const AccountForm: React.FC<{ locale: string }> = ({ locale }) => {
           </div>
         </Fragment>
       )}
-      <Button disabled={isLoading || isSubmitting || !isDirty} type="submit" variant="default">
+      <Button disabled={isLoading || isSubmitting || !isDirty} type="submit" variant="default" className='rounded-none'>
         {isLoading || isSubmitting
           ? locale === 'de'
             ? 'Wird verarbeitet'

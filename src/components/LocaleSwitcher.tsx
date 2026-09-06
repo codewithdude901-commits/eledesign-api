@@ -52,13 +52,13 @@ export function LocaleSwitcher() {
   const currentLabel = locales.find((locale) => locale.code === currentLocale)?.label ?? 'Deutsch'
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative p-2.5 rounded-full text-black  hover:bg-black/5 transition-all duration-200 focus:outline-none  items-center justify-center cursor-pointer">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="flex items-center gap-1.5 text-brand-charcoal/70 transition-colors hover:text-brand-charcoal"
+        className="flex items-center gap-1.5 text-brand-charcoal/70 transition-colors hover:text-brand-charcoal cursor-pointer"
       >
         <Languages className="h-5 w-5" />
 

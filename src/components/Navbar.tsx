@@ -25,13 +25,15 @@ export const Navbar: React.FC = () => {
   const navLinksDe = [
     { name: 'Gartenpakete', href: '/gardens' },
     { name: 'AI-Konzept-Builder', href: '/your-garden' },
-    { name: 'Pflanzanleitung', href: '/#' },
+    { name: 'Pflanzanleitung', href: '/plant-guide' },
+    { name: 'Kontakt', href: '/contact' },
   ]
 
   const navLinksEn = [
     { name: 'Gardens', href: '/en/gardens' },
     { name: 'AI Studio', href: '/en/your-garden' },
-    { name: 'Planting Guide', href: '/#' },
+    { name: 'Planting Guide', href: '/plant-guide' },
+    { name: 'Contact', href: '/contact' },
   ]
 
   const navLinks = locale === 'de' ? navLinksDe : navLinksEn
@@ -41,14 +43,19 @@ export const Navbar: React.FC = () => {
       <header className="sticky top-0 z-40 w-full glass-nav shadow-sm bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[8vh] flex items-center justify-between">
           {/* Left: Logo */}
+            <div className="block flex-none md:hidden">
+              <Suspense fallback={null}>
+                <MobileMenu menu={navLinks} locale={locale} />
+              </Suspense>
+            </div>
           <div className="flex items-center overflow-hidden h-full">
             <Link
               href={`/${locale}`}
-              className="flex items-center gap-2 group focus:outline-none w-48 h-full "
+              className="flex items-center gap-2 group focus:outline-none w-48 justify-center h-full "
             >
               <img
                 src={'/logo.jpeg'}
-                className="w-full max-w-40 md:max-w-60 h-auto -ml-2 md:-ml-4 "
+                className="w-full max-w-40 md:max-w-60 h-auto  md:-ml-4 "
               />
             </Link>
           </div>
@@ -92,14 +99,10 @@ export const Navbar: React.FC = () => {
 
             {/* Shopping Cart Button */}
             <Suspense fallback={<OpenCartButton />}>
-              <Cart />
+              <Cart locale={locale}/>
             </Suspense>
 
-            <div className="block flex-none md:hidden">
-              <Suspense fallback={null}>
-                <MobileMenu menu={navLinks} locale={locale} />
-              </Suspense>
-            </div>
+          
           </div>
         </div>
       </header>

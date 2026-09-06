@@ -8,7 +8,7 @@ export type PathFilterItem = {
 }
 
 export type FilterOption = {
-  title: string
+  title: { de: string; en: string }
   value: string
 }
 
@@ -19,15 +19,31 @@ type FilterListProps = {
   maintenance: FilterOption[]
   sunlight: FilterOption[]
   style: FilterOption[]
+  locale: 'de' | 'en'
 }
 
-export function FilterList({ sorting, maintenance, sunlight, style }: FilterListProps) {
+export function FilterList({ sorting, maintenance, sunlight, style, locale }: FilterListProps) {
   return (
     <div className="flex w-full flex-col gap-3 md:flex-row md:items-end lg:justify-end">
-      <FilterItemDropdown list={maintenance} param="maintenance" title="Maintenance" />
+      <FilterItemDropdown
+        list={maintenance}
+        param="maintenance"
+        title={locale === 'de' ? 'Pflegebedarf' : 'Maintenance'}
+        locale={locale}
+      />
 
-      <FilterItemDropdown list={sunlight} param="sunlight" title="Sunlight" />
-      <FilterItemDropdown list={style} param="style" title="Garden Style" />
+      <FilterItemDropdown
+        list={sunlight}
+        param="sunlight"
+        title={locale === 'de' ? 'Sonnenlicht' : 'Sunlight'}
+        locale={locale}
+      />
+      <FilterItemDropdown
+        list={style}
+        param="style"
+        title={locale === 'de' ? 'Gartenstil' : 'Garden Style'}
+        locale={locale}
+      />
 
       {/* <FilterItemDropdown list={sorting} param="sort" title="Sort by" /> */}
     </div>

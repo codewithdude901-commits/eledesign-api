@@ -370,7 +370,7 @@ export const CheckoutPage: React.FC = () => {
                     setProcessingPayment={setProcessingPayment}
                   />
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     className="self-start rounded-none"
                     onClick={() => setPaymentData(null)}
                   >

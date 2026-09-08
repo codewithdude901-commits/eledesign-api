@@ -117,7 +117,7 @@ export default async function Order({ params, searchParams }: PageProps) {
       <div className="flex flex-col gap-8 items-start sm:flex-row justify-between sm:items-center mb-6">
         {user ? (
           <div className="flex gap-4">
-            <Button asChild variant="ghost" className="rounded-none">
+            <Button asChild variant="outline" className="rounded-none">
               <Link href={`/${locale}/orders`}>
                 <ChevronLeftIcon />
                 {locale === 'de' ? 'Alle Bestellungen' : 'All orders'}

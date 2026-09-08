@@ -4,11 +4,10 @@ import type { Product, Variant } from '@/payload-types'
 
 import { AddToCart } from '@/components/Cart/AddToCart'
 import { Price } from '@/components/Price'
-import React, { Suspense } from 'react'
+import { Suspense } from 'react'
 
-import { VariantSelector } from './VariantSelector'
 import { useCurrency } from '@payloadcms/plugin-ecommerce/client/react'
-import { StockIndicator } from '@/components/product/StockIndicator'
+import { VariantSelector } from './VariantSelector'
 
 export function ProductDescription({ product }: { product: Product }) {
   const { currency } = useCurrency()
@@ -58,9 +57,13 @@ export function ProductDescription({ product }: { product: Product }) {
 
         <div className="uppercase font-mono">
           {hasVariants ? (
-            <Price highestAmount={highestAmount} lowestAmount={lowestAmount} />
+            <Price
+              highestAmount={highestAmount}
+              lowestAmount={lowestAmount}
+              className="font-bold"
+            />
           ) : (
-            <Price amount={amount} />
+            <Price amount={amount} className="font-bold" />
           )}
         </div>
       </div>
@@ -83,11 +86,11 @@ export function ProductDescription({ product }: { product: Product }) {
         </>
       )}
 
-      <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
         <Suspense fallback={null}>
           <StockIndicator product={product} />
         </Suspense>
-      </div>
+      </div> */}
 
       <div className="flex items-center justify-between">
         <Suspense fallback={null}>

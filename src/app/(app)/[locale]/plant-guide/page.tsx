@@ -310,8 +310,8 @@ export default async function PlantGuidePage({ params }: PlantGuidePageProps) {
   const t = translations[currentLocale]
 
   return (
-    <main className="min-h-screen text-stone-900 py-12 md:py-20 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-7xl mx-auto space-y-12 md:space-y-20">
+    <main className="min-h-screen text-stone-900 py-12 ">
+      <div className="max-w-7xl mx-auto space-y-12 md:space-y-20 px-4 sm:px-6 lg:px-8">
         {/* Header Hero Section */}
         <header className="max-w-3xl border-b border-stone-200 pb-8 md:pb-10">
           <span className="text-xs uppercase tracking-widest text-emerald-800 font-semibold mb-2 block">
@@ -324,20 +324,20 @@ export default async function PlantGuidePage({ params }: PlantGuidePageProps) {
         </header>
 
         {/* Highlights Bar */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-stone-200/50 p-6 md:p-10 rounded-none">
-          <div className="border-b md:border-b-0 md:border-r border-stone-400 pb-4 md:pb-0 md:pr-6">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-emerald-700 p-6 md:p-10 rounded-none text-white">
+          <div className="border-b md:border-b-0 md:border-r border-stone-100 pb-4 md:pb-0 md:pr-6">
             <span className="text-2xl md:text-3xl font-bold  block mb-1">
               {t.stat1Number}
             </span>
-            <span className="text-xs uppercase tracking-wider text-stone-800 font-medium">
+            <span className="text-xs uppercase tracking-wider  font-medium">
               {t.stat1Label}
             </span>
           </div>
-          <div className="border-b md:border-b-0 md:border-r border-stone-800 pb-4 md:pb-0 md:pr-6">
+          <div className="border-b md:border-b-0 md:border-r border-stone-100 pb-4 md:pb-0 md:pr-6">
             <span className="text-2xl md:text-3xl font-bold  block mb-1">
               {t.stat2Number}
             </span>
-            <span className="text-xs uppercase tracking-wider text-stone-800 font-medium">
+            <span className="text-xs uppercase tracking-wider  font-medium">
               {t.stat2Label}
             </span>
           </div>
@@ -345,7 +345,7 @@ export default async function PlantGuidePage({ params }: PlantGuidePageProps) {
             <span className="text-2xl md:text-3xl font-bold  block mb-1">
               {t.stat3Number}
             </span>
-            <span className="text-xs uppercase tracking-wider text-stone-800 font-medium">
+            <span className="text-xs uppercase tracking-wider  font-medium">
               {t.stat3Label}
             </span>
           </div>
@@ -354,27 +354,27 @@ export default async function PlantGuidePage({ params }: PlantGuidePageProps) {
         {/* Shipping & Protection Section */}
         <section className="space-y-6">
           <div>
-            <span className="text-xs uppercase tracking-widest text-emerald-800 font-semibold block mb-1">
+            {/* <span className="text-xs uppercase tracking-widest text-emerald-800 font-semibold block mb-1">
               Logistics
-            </span>
+            </span> */}
             <h2 className="text-2xl md:text-3xl font-bold text-stone-900">{t.shippingHeading}</h2>
             <p className="text-stone-800">{t.shippingSub}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white border border-stone-200 p-6 rounded-none space-y-2">
+            <div className="bg-rose-100 border border-stone-200 p-6 rounded-none space-y-2">
               <span className="text-xs font-mono text-stone-800 block">01 / PACKAGING</span>
               <h3 className="text-base font-bold text-stone-900">{t.box1Title}</h3>
               <p className=" text-stone-800 leading-relaxed">{t.box1Desc}</p>
             </div>
 
-            <div className="bg-white border border-stone-200 p-6 rounded-none space-y-2">
+            <div className="bg-sky-100 border border-stone-200 p-6 rounded-none space-y-2">
               <span className="text-xs font-mono text-stone-800 block">02 / HYDRATION</span>
               <h3 className="text-base font-bold text-stone-900">{t.box2Title}</h3>
               <p className=" text-stone-800 leading-relaxed">{t.box2Desc}</p>
             </div>
 
-            <div className="bg-white border border-stone-200 p-6 rounded-none space-y-2">
+            <div className="bg-orange-100 border border-stone-200 p-6 rounded-none space-y-2">
               <span className="text-xs font-mono text-stone-800 block">03 / TRANSPORT</span>
               <h3 className="text-base font-bold text-stone-900">{t.box3Title}</h3>
               <p className=" text-stone-800 leading-relaxed">{t.box3Desc}</p>
@@ -385,30 +385,30 @@ export default async function PlantGuidePage({ params }: PlantGuidePageProps) {
         {/* Step-by-Step Interactive Guide */}
         <section className="space-y-6">
           <div>
-            <span className="text-xs uppercase tracking-widest text-emerald-800 font-semibold block mb-1">
+            {/* <span className="text-xs uppercase tracking-widest text-emerald-800 font-semibold block mb-1">
               Implementation
-            </span>
+            </span> */}
             <h2 className="text-2xl md:text-3xl font-bold text-stone-900">{t.stepsTitle}</h2>
             <p className="text-stone-800">{t.stepsSub}</p>
           </div>
 
-          <GuideTabs steps={t.steps} />
+          <GuideTabs steps={t.steps} locale={locale}/>
         </section>
 
         {/* PDF Feature Breakdown */}
-        <section className="bg-stone-200/50 border border-stone-300 p-6 md:p-10 rounded-none space-y-6">
+        <section className="bg-stone-100 border text-  p-6 md:p-10 rounded-none space-y-6">
           <div className="max-w-2xl">
-            <span className="text-xs uppercase tracking-widest text-emerald-800 font-semibold block mb-1">
+            {/* <span className="text-xs uppercase tracking-widest text-emerald-800 font-semibold block mb-1">
               Digital Assets
-            </span>
-            <h2 className="text-xl md:text-2xl font-bold text-stone-900">{t.pdfFeatureTitle}</h2>
+            </span> */}
+            <h2 className="text-xl md:text-2xl font-bold">{t.pdfFeatureTitle}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {t.pdfFeatures.map((feature, idx) => (
               <div
                 key={idx}
-                className="bg-white p-6 border border-stone-300 rounded-none space-y-2"
+                className="bg-white p-6 border border-stone-200 rounded-none space-y-2"
               >
                 <span className="text-sm font-mono text-emerald-800 font-bold block">
                   FEATURE 0{idx + 1}
@@ -423,9 +423,9 @@ export default async function PlantGuidePage({ params }: PlantGuidePageProps) {
         {/* FAQ Section */}
         <section className="space-y-6">
           <div>
-            <span className="text-xs uppercase tracking-widest text-emerald-800 font-semibold block mb-1">
+            {/* <span className="text-xs uppercase tracking-widest text-emerald-800 font-semibold block mb-1">
               Help Center
-            </span>
+            </span> */}
             <h2 className="text-2xl md:text-3xl font-bold text-stone-900">{t.faqTitle}</h2>
           </div>
 
@@ -433,18 +433,18 @@ export default async function PlantGuidePage({ params }: PlantGuidePageProps) {
         </section>
 
         {/* Contact CTA Section */}
-        <section className="bg-stone-800 text-white p-8 md:p-12 rounded-none flex flex-col md:flex-row items-start md:items-center justify-between gap-6 ">
+        <section className="bg-sky-800 text-white p-8 md:p-12 rounded-none flex flex-col md:flex-row items-start md:items-center justify-between gap-6 ">
           <div className="max-w-2xl space-y-2">
-            <span className="text-xs uppercase tracking-widest text-emerald-400 font-mono">
+            {/* <span className="text-xs uppercase tracking-widest text-emerald-400 font-mono">
               Support & Inquiries
-            </span>
+            </span> */}
             <h2 className="text-2xl md:text-3xl font-bold text-white">{t.ctaHeading}</h2>
-            <p className="text-stone-300 leading-relaxed">{t.ctaSubheading}</p>
+            <p className="text-stone-100 leading-relaxed">{t.ctaSubheading}</p>
           </div>
 
           <Link
             href={`/${currentLocale}/contact`}
-            className="inline-block px-6 py-3.5 bg-white text-stone-900 hover:bg-white/90  text-xs uppercase tracking-widest font-bold transition-colors rounded-none whitespace-nowrap"
+            className="inline-block px-6 py-3.5 bg-white text-stone-900 hover:bg-white/95  text-xs uppercase tracking-widest font-bold transition-colors rounded-none whitespace-nowrap"
           >
             {t.ctaButton}
           </Link>

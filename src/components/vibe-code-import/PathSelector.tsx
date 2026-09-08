@@ -108,78 +108,6 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
 
         {/* Dual Cards Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-stretch">
-          {/* CARD A: Readymade Outdoor Concepts */}
-          <motion.div
-            initial={{ opacity: 0, y: 25 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="group relative  bg-white border border-brand-charcoal/10 overflow-hidden shadow-sm hover:shadow-lg  transition-all duration-500 flex flex-col justify-between"
-          >
-            {/* Top Image Banner */}
-            <div className="relative h-64 sm:h-80 lg:h-72 w-full overflow-hidden">
-              <img
-                src="/readymade-concepts.jpg"
-                alt="Readymade Outdoor Garden Concept"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Card Content */}
-            <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-4">
-              <h3 className="text-2xl sm:text-3xl font-extrabold drop-shadow-sm text-green-800">
-                {pathSelector?.paths && pathSelector?.paths[0]?.title}
-              </h3>
-
-              <p className="text-sm sm:text-base leading-relaxed font-sans">
-                {pathSelector?.paths && pathSelector?.paths[0]?.description}
-              </p>
-
-              {/* Feature Highlights */}
-              <div className="space-y-2.5 pt-2">
-                <div className="flex items-center gap-3 font-medium">
-                  <CheckCircle2 className="w-5 h-5 shrink-0 text-blue-600 " />
-                  <span>
-                    {pathSelector?.paths &&
-                      pathSelector?.paths[0]?.list &&
-                      pathSelector?.paths[0]?.list[0].item}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 font-medium">
-                  <Sun className="w-5 h-5 text-amber-600 shrink-0" />
-                  <span>
-                    {pathSelector?.paths &&
-                      pathSelector?.paths[0]?.list &&
-                      pathSelector?.paths[0]?.list[1].item}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 font-medium">
-                  <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
-                  <span>
-                    {pathSelector?.paths &&
-                      pathSelector?.paths[0]?.list &&
-                      pathSelector?.paths[0]?.list[2].item}
-                  </span>
-                </div>
-              </div>
-
-              {/* Card Actions */}
-              <div className="pt-4 border-t border-brand-charcoal/10 flex flex-col sm:flex-row items-center gap-3">
-                <Link
-                  href={`/${locale}/gardens`}
-                  className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-green-700 text-white font-bold  shadow-md transition-all hover:scale-[1] active:scale-[0.99] text-center sm:text-left"
-                >
-                  <span>
-                    {locale === 'de'
-                      ? 'Entdecken Sie Fertigkonzepte'
-                      : 'Explore Readymade Concepts'}
-                  </span>
-                  <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform shrink-0" />
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-
           {/* CARD B: AI Photo Generator (Powered by Neighborbrite) */}
           <motion.div
             initial={{ opacity: 0, y: 25 }}
@@ -285,6 +213,77 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
                       : 'Design Outdoor Space with AI'}
                   </span>
                   <Wand2 className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0 ml-1" />
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+          {/* CARD A: Readymade Outdoor Concepts */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="group relative  bg-white border border-brand-charcoal/10 overflow-hidden shadow-sm hover:shadow-lg  transition-all duration-500 flex flex-col justify-between"
+          >
+            {/* Top Image Banner */}
+            <div className="relative h-64 sm:h-80 lg:h-72 w-full overflow-hidden">
+              <img
+                src="/readymade-concepts.jpg"
+                alt="Readymade Outdoor Garden Concept"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Card Content */}
+            <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-4">
+              <h3 className="text-2xl sm:text-3xl font-extrabold drop-shadow-sm text-green-800">
+                {pathSelector?.paths && pathSelector?.paths[0]?.title}
+              </h3>
+
+              <p className="text-sm sm:text-base leading-relaxed font-sans">
+                {pathSelector?.paths && pathSelector?.paths[0]?.description}
+              </p>
+
+              {/* Feature Highlights */}
+              <div className="space-y-2.5 pt-2">
+                <div className="flex items-center gap-3 font-medium">
+                  <CheckCircle2 className="w-5 h-5 shrink-0 text-blue-600 " />
+                  <span>
+                    {pathSelector?.paths &&
+                      pathSelector?.paths[0]?.list &&
+                      pathSelector?.paths[0]?.list[0].item}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 font-medium">
+                  <Sun className="w-5 h-5 text-amber-600 shrink-0" />
+                  <span>
+                    {pathSelector?.paths &&
+                      pathSelector?.paths[0]?.list &&
+                      pathSelector?.paths[0]?.list[1].item}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 font-medium">
+                  <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <span>
+                    {pathSelector?.paths &&
+                      pathSelector?.paths[0]?.list &&
+                      pathSelector?.paths[0]?.list[2].item}
+                  </span>
+                </div>
+              </div>
+
+              {/* Card Actions */}
+              <div className="pt-4 border-t border-brand-charcoal/10 flex flex-col sm:flex-row items-center gap-3">
+                <Link
+                  href={`/${locale}/gardens`}
+                  className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-green-700 text-white font-bold  shadow-md transition-all hover:scale-[1] active:scale-[0.99] text-center sm:text-left"
+                >
+                  <span>
+                    {locale === 'de'
+                      ? 'Entdecken Sie Fertigkonzepte'
+                      : 'Explore Readymade Concepts'}
+                  </span>
+                  <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform shrink-0" />
                 </Link>
               </div>
             </div>

@@ -5,8 +5,9 @@ import type { Product, Variant } from '@/payload-types'
 import { useCartUI } from '@/providers/CartUIContext'
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import clsx from 'clsx'
+import { Loader2 } from 'lucide-react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 type Props = {
@@ -22,6 +23,9 @@ export function AddToCart({ product }: Props) {
   const locale = params.locale
   const searchParams = useSearchParams()
   const router = useRouter()
+
+  // Track auto-add loading state specifically for direct URL execution (?add=1)
+  const [isAutoAdding, setIsAutoAdding] = useState(false)
 
   // Prevent ?add=1 from executing more than once
   const autoAddTriggered = useRef(false)
@@ -79,7 +83,7 @@ export function AddToCart({ product }: Props) {
       try {
         await addProductToCart()
 
-        toast.success('Item added to cart.')
+        toast.success(locale === 'de' ? 'Artikel zum Warenkorb hinzugefügt.' : 'Item added to cart.')
         openCart()
       } catch (error) {
         console.error('Failed to add item to cart:', error)
@@ -93,18 +97,7 @@ export function AddToCart({ product }: Props) {
    * Special external hand-off flow.
    *
    * Example:
-   *
    * /products/garden-1?variant=XYZ&add=1
-   *
-   * IMPORTANT:
-   * We deliberately do NOT use addItem() here.
-   *
-   * Payload's addItem() decides whether to create a new cart
-   * based on its internal cartID state. During page initialization
-   * that state can still be undefined even though localStorage
-   * already contains the existing cart.
-   *
-   * Therefore we use the persisted cart ID directly.
    */
   const autoAddProduct = useCallback(async () => {
     if (!cart?.id) {
@@ -152,6 +145,10 @@ export function AddToCart({ product }: Props) {
 
     if (!shouldAutoAdd) return
     if (autoAddTriggered.current) return
+
+    // Show loading state while waiting for Payload cart restoration or adding
+    setIsAutoAdding(true)
+
     if (isLoading) return
 
     // Wait until Payload has restored the existing cart.
@@ -184,6 +181,8 @@ export function AddToCart({ product }: Props) {
         autoAddTriggered.current = false
 
         toast.error('Unable to add item to cart.')
+      } finally {
+        setIsAutoAdding(false)
       }
     }
 
@@ -225,10 +224,6 @@ export function AddToCart({ product }: Props) {
       return false
     })
 
-    /*
-     * Product/variant is already in the cart.
-     * Check inventory against current quantity.
-     */
     if (existingItem) {
       const existingQuantity = existingItem.quantity || 0
 
@@ -239,9 +234,6 @@ export function AddToCart({ product }: Props) {
       return existingQuantity >= (product.inventory || 0)
     }
 
-    /*
-     * Variant product.
-     */
     if (product.enableVariants) {
       if (!selectedVariant) {
         return true
@@ -250,12 +242,7 @@ export function AddToCart({ product }: Props) {
       if (selectedVariant.inventory === 0) {
         return true
       }
-    }
-
-    /*
-     * Normal product.
-     */
-    else if (product.inventory === 0) {
+    } else if (product.inventory === 0) {
       return true
     }
 
@@ -263,17 +250,40 @@ export function AddToCart({ product }: Props) {
   }, [selectedVariant, cart?.items, product])
 
   return (
-    <Button
-      aria-label="Add to cart"
-      variant="outline"
-      className={clsx({
-        'rounded-none hover:opacity-90 bg-emerald-600 hover:bg-emerald-600 text-white min-w-40': true,
-      })}
-      disabled={disabled || isLoading}
-      onClick={handleAddToCart}
-      type="submit"
-    >
-      {locale === 'de' ? 'In den Warenkorb legen' : 'Add To Cart'}
-    </Button>
+    <>
+      {/* Full-screen loading overlay when direct URL purchase (?add=1) is processing */}
+      {isAutoAdding && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/40 backdrop-blur-xs text-white">
+          <div className="flex flex-col items-center gap-3 bg-stone-900/90 p-6 shadow-xl border border-stone-800">
+            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+            <p className="text-sm font-medium">
+              {locale === 'de' ? 'Warenkorb wird aktualisiert...' : 'Adding product to cart...'}
+            </p>
+          </div>
+        </div>
+      )}
+
+      <Button
+        aria-label="Add to cart"
+        variant="outline"
+        className={clsx({
+          'rounded-none hover:opacity-90 bg-emerald-600 hover:bg-emerald-600 text-white min-w-40': true,
+        })}
+        disabled={disabled || isLoading || isAutoAdding}
+        onClick={handleAddToCart}
+        type="submit"
+      >
+        {isAutoAdding ? (
+          <span className="inline-flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {locale === 'de' ? 'Wird hinzugefügt...' : 'Adding...'}
+          </span>
+        ) : locale === 'de' ? (
+          'In den Warenkorb legen'
+        ) : (
+          'Add To Cart'
+        )}
+      </Button>
+    </>
   )
 }

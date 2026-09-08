@@ -77,11 +77,12 @@ export const ForgotPasswordForm: React.FC<Props> = ({ locale }: Props) => {
                 id="email"
                 {...register('email', { required: 'Please provide your email.' })}
                 type="email"
+                className='rounded-none'
               />
               {errors.email && <FormError message={errors.email.message} />}
             </FormItem>
 
-            <Button type="submit" variant="default">
+            <Button type="submit" variant="default" className='rounded-none'>
               {locale === 'de' ? 'Passwort vergessen' : 'Forgot Password'}
             </Button>
           </form>

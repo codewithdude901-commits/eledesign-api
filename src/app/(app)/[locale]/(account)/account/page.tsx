@@ -54,14 +54,14 @@ export default async function AccountPage({ params }: Props) {
 
   return (
     <>
-      <div className="border p-8  bg-primary-foreground">
+      <div className="border p-8  ">
         <h1 className="text-3xl font-medium mb-8">
           {locale === 'de' ? 'Kontoeinstellungen' : 'Account settings'}
         </h1>
         <AccountForm locale={locale} />
       </div>
 
-      <div className=" border p-8  bg-primary-foreground">
+      <div className=" border p-8  ">
         <h2 className="text-3xl font-medium mb-8">
           {locale === 'de' ? 'Letzte Bestellungen' : 'Recent Orders'}
         </h2>
@@ -86,14 +86,14 @@ export default async function AccountPage({ params }: Props) {
           <ul className="flex flex-col gap-6 mb-8">
             {orders?.map((order, index) => (
               <li key={order.id}>
-                <OrderItem order={order} />
+                <OrderItem order={order} locale={locale} />
               </li>
             ))}
           </ul>
         )}
 
-        <Button asChild variant="default" className='rounded-none'>
-          <Link href="/orders">
+        <Button asChild variant="default" className="rounded-none">
+          <Link href={`/${locale}/orders`}>
             {locale === 'de' ? 'Alle Bestellungen ansehen' : 'View all orders'}
           </Link>
         </Button>

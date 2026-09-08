@@ -17,14 +17,14 @@ interface FAQ {
   category: string
 }
 
-export function GuideTabs({ steps }: { steps: Step[] }) {
+export function GuideTabs({ steps, locale }: { steps: Step[]; locale: 'de' | 'en' }) {
   const [activeTab, setActiveTab] = useState(steps[0].id)
   const currentStep = steps.find((s) => s.id === activeTab) || steps[0]
 
   return (
     <div className="border border-stone-200 bg-white rounded-none">
       {/* Mobile-optimized scrollable tab header */}
-      <div className="flex overflow-x-auto no-scrollbar border-b border-stone-200 bg-stone-100 divide-x divide-stone-200">
+      <div className="flex overflow-x-auto no-scrollbar border-b border-stone-200  divide-x divide-stone-200">
         {steps.map((step, idx) => {
           const isActive = step.id === activeTab
           return (
@@ -33,14 +33,16 @@ export function GuideTabs({ steps }: { steps: Step[] }) {
               onClick={() => setActiveTab(step.id)}
               className={`flex-1 min-w-[140px] sm:min-w-0 p-4 text-left transition-colors rounded-none whitespace-nowrap sm:whitespace-normal ${
                 isActive
-                  ? 'bg-white text-stone-900 border-b-2 border-b-emerald-800'
+                  ? 'bg-emerald-700 text-white'
                   : 'text-stone-500 hover:text-stone-900 hover:bg-stone-50'
               }`}
             >
-              <span className="text-xs uppercase tracking-widest font-semibold text-emerald-800 block mb-1">
+              <span className="text-xs uppercase tracking-widest font-semibold block mb-1">
                 Step 0{idx + 1}
               </span>
-              <span className="text-sm sm:text-base font-semibold block leading-tight">{step.title}</span>
+              <span className="text-sm sm:text-base font-semibold block leading-tight">
+                {step.title}
+              </span>
             </button>
           )
         })}
@@ -73,9 +75,9 @@ export function GuideTabs({ steps }: { steps: Step[] }) {
           </div>
         </div>
 
-        <div className="lg:col-span-5 bg-stone-800 text-stone-100 p-6 rounded-none space-y-2">
-          <span className="text-sm uppercase tracking-widest text-emerald-400 font-mono block font-semibold">
-            PRO TIP
+        <div className="lg:col-span-5 bg-sky-800 text-stone-100 p-6 rounded-none space-y-2">
+          <span className="text-sm uppercase tracking-widest text-yellow-300 font-mono block font-semibold">
+            {locale === 'de' ? 'Profi-Tipp' : '  PRO TIP'}
           </span>
           <p className=" text-stone-00 leading-relaxed">{currentStep.tip}</p>
         </div>

@@ -14,17 +14,17 @@ import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import React, { Suspense, useCallback, useEffect, useState } from 'react'
 
-import { cssVariables } from '@/cssVariables'
-import { CheckoutForm } from '@/components/forms/CheckoutForm'
-import { useAddresses, useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
-import { CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
-import { CreateAddressModal } from '@/components/addresses/CreateAddressModal'
-import { Address } from '@/payload-types'
-import { Checkbox } from '@/components/ui/checkbox'
 import { AddressItem } from '@/components/addresses/AddressItem'
+import { CreateAddressModal } from '@/components/addresses/CreateAddressModal'
+import { CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
+import { CheckoutForm } from '@/components/forms/CheckoutForm'
 import { FormItem } from '@/components/forms/FormItem'
-import { toast } from 'sonner'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { Checkbox } from '@/components/ui/checkbox'
+import { cssVariables } from '@/cssVariables'
+import { Address } from '@/payload-types'
+import { useAddresses, useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
+import { toast } from 'sonner'
 
 const apiKey = `${process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}`
 const stripe = loadStripe(apiKey)
@@ -133,28 +133,30 @@ export const CheckoutPage: React.FC = () => {
   return (
     <div className="flex flex-col items-stretch justify-stretch my-8 md:flex-row grow gap-10 md:gap-6 lg:gap-8">
       <div className="basis-full lg:basis-2/3 flex flex-col gap-8 justify-stretch">
-        <h2 className="font-medium text-3xl">Contact</h2>
+        <h2 className="font-medium text-3xl">{locale === 'de' ? 'Kontakt' : 'Contact'}</h2>
         {!user && (
           <div className=" bg-accent dark:bg-black rounded-lg p-4 w-full flex items-center">
             <div className="prose dark:prose-invert">
-              <Button asChild className="no-underline text-inherit" variant="outline">
-                <Link href="/login">Log in</Link>
+              <Button asChild className="no-underline text-inherit rounded-none" variant="outline">
+                <Link href={`/${locale}/login`}>Log in</Link>
               </Button>
               <p className="mt-0">
                 <span className="mx-2">or</span>
-                <Link href="/create-account">create an account</Link>
+                <Link href={`/${locale}/create-account`}>
+                  {locale === 'de' ? 'ein Konto erstellen' : 'create an account'}
+                </Link>
               </p>
             </div>
           </div>
         )}
         {user ? (
-          <div className="bg-accent dark:bg-card rounded-lg p-4 ">
+          <div className="bg-accent dark:bg-card p-4 ">
             <div>
               <p>{user.email}</p>{' '}
               <p>
-                Not you?{' '}
-                <Link className="underline" href="/logout">
-                  Log out
+                {locale === 'de' ? 'Du nicht?' : 'Not you?'}{' '}
+                <Link className="underline" href={`/${locale}/logout`}>
+                  {locale === 'de' ? 'Abmelden' : 'Log out'}
                 </Link>
               </p>
             </div>
@@ -162,10 +164,16 @@ export const CheckoutPage: React.FC = () => {
         ) : (
           <div className="bg-accent dark:bg-black rounded-lg p-4 ">
             <div>
-              <p className="mb-4">Enter your email to checkout as a guest.</p>
+              <p className="mb-4">
+                {locale === 'de'
+                  ? 'Geben Sie Ihre E-Mail-Adresse ein, um als Gast zur Kasse zu gehen.'
+                  : 'Enter your email to checkout as a guest.'}
+              </p>
 
               <FormItem className="mb-6">
-                <Label htmlFor="email">Email Address</Label>
+                <Label htmlFor="email">
+                  {locale === 'de' ? 'E-Mail-Adresse' : 'Email Address'}
+                </Label>
                 <Input
                   disabled={!emailEditable}
                   id="email"
@@ -173,6 +181,7 @@ export const CheckoutPage: React.FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   type="email"
+                  className="rounded-none"
                 />
               </FormItem>
 
@@ -183,14 +192,15 @@ export const CheckoutPage: React.FC = () => {
                   setEmailEditable(false)
                 }}
                 variant="default"
+                className="rounded-none"
               >
-                Continue as guest
+                {locale === 'de' ? 'Als Gast fortfahren' : 'Continue as guest'}
               </Button>
             </div>
           </div>
         )}
 
-        <h2 className="font-medium text-3xl">Address</h2>
+        <h2 className="font-medium text-3xl">{locale === 'de' ? 'Adresse' : 'Address'}</h2>
 
         {billingAddress ? (
           <div>
@@ -204,8 +214,9 @@ export const CheckoutPage: React.FC = () => {
                     e.preventDefault()
                     setBillingAddress(undefined)
                   }}
+                  className="rounded-none"
                 >
-                  Remove
+                  {locale === 'de' ? 'Entfernen' : 'Remove'}
                 </Button>
               }
               address={billingAddress}
@@ -213,7 +224,8 @@ export const CheckoutPage: React.FC = () => {
           </div>
         ) : user ? (
           <CheckoutAddresses
-            heading="Billing address"
+            heading={locale === 'de' ? 'Rechnungsadresse' : 'Billing address'}
+
             setAddress={setBillingAddress}
             locale={locale}
           />
@@ -236,8 +248,13 @@ export const CheckoutPage: React.FC = () => {
             onCheckedChange={(state) => {
               setBillingAddressSameAsShipping(state as boolean)
             }}
+            className="rounded-none"
           />
-          <Label htmlFor="shippingTheSameAsBilling">Shipping is the same as billing</Label>
+          <Label htmlFor="shippingTheSameAsBilling">
+            {locale === 'de'
+              ? 'Lieferadresse entspricht der Rechnungsadresse.'
+              : 'Shipping is the same as billing'}
+          </Label>
         </div>
 
         {!billingAddressSameAsShipping && (
@@ -254,8 +271,9 @@ export const CheckoutPage: React.FC = () => {
                         e.preventDefault()
                         setShippingAddress(undefined)
                       }}
+                      className="rounded-none"
                     >
-                      Remove
+                      {locale === 'de' ? 'Entfernen' : 'Remove'}
                     </Button>
                   }
                   address={shippingAddress}
@@ -264,7 +282,8 @@ export const CheckoutPage: React.FC = () => {
             ) : user ? (
               <CheckoutAddresses
                 locale={locale}
-                heading="Shipping address"
+
+                heading={locale === 'de' ? 'Lieferadresse' : 'Shipping address'}
                 description="Please select a shipping address."
                 setAddress={setShippingAddress}
               />
@@ -283,14 +302,14 @@ export const CheckoutPage: React.FC = () => {
 
         {!paymentData && (
           <Button
-            className="self-start"
+            className="self-start rounded-none"
             disabled={!canGoToPayment}
             onClick={(e) => {
               e.preventDefault()
               void initiatePaymentIntent('stripe')
             }}
           >
-            Go to payment
+            {locale === 'de' ? 'Zur Zahlung' : 'Go to payment'}
           </Button>
         )}
 
@@ -304,8 +323,9 @@ export const CheckoutPage: React.FC = () => {
                 router.refresh()
               }}
               variant="default"
+              className="rounded-none"
             >
-              Try again
+              {locale === 'de' ? 'Versuchen Sie es erneut' : 'Try again'}
             </Button>
           </div>
         )}
@@ -351,10 +371,10 @@ export const CheckoutPage: React.FC = () => {
                   />
                   <Button
                     variant="ghost"
-                    className="self-start"
+                    className="self-start rounded-none"
                     onClick={() => setPaymentData(null)}
                   >
-                    Cancel payment
+                    {locale === 'de' ? 'Zahlung stornieren' : 'Cancel payment'}
                   </Button>
                 </div>
               </Elements>
@@ -364,13 +384,13 @@ export const CheckoutPage: React.FC = () => {
       </div>
 
       {!cartIsEmpty && (
-        <div className="basis-full lg:basis-1/3 lg:pl-8 p-8 border-none bg-primary/5 flex flex-col gap-8 rounded-lg">
+        <div className="basis-full lg:basis-1/3 lg:pl-8 p-4 border-none bg-primary/5 flex flex-col gap-8 ">
           <h2 className="text-3xl font-medium">Your cart</h2>
           {cart?.items?.map((item, index) => {
             if (typeof item.product === 'object' && item.product) {
               const {
                 product,
-                product: { id, meta, title, gallery },
+                product: { id, meta, title, gallery, common_name },
                 quantity,
                 variant,
               } = item
@@ -407,33 +427,35 @@ export const CheckoutPage: React.FC = () => {
 
               return (
                 <div className="flex items-start gap-4" key={index}>
-                  <div className="flex items-stretch justify-stretch h-20 w-20 p-2 rounded-lg border">
-                    <div className="relative w-full h-full">
+                  <div className="flex items-stretch justify-stretch h-20 w-20 p-2  border shrink-0">
+                    <div className="relative w-full h-full ">
                       {image && typeof image !== 'string' && (
-                        <Media className="" fill imgClassName="rounded-lg" resource={image} />
+                        <Media className="" fill imgClassName="" resource={image} />
                       )}
                     </div>
                   </div>
                   <div className="flex grow justify-between items-center">
                     <div className="flex flex-col gap-1">
-                      <p className="font-medium text-lg">{title}</p>
-                      {variant && typeof variant === 'object' && (
-                        <p className="text-sm font-mono text-primary/50 tracking-widest">
-                          {variant.options
-                            ?.map((option) => {
-                              if (typeof option === 'object') return option.label
-                              return null
-                            })
-                            .join(', ')}
-                        </p>
-                      )}
-                      <div>
-                        {'x'}
-                        {quantity}
+                      <p className="text-sm font-medium">{common_name}</p>
+                      <div className="flex items-center gap-2">
+                        {variant && typeof variant === 'object' && (
+                          <p className="text-xs tracking-wide">
+                            {variant.options
+                              ?.map((option) => {
+                                if (typeof option === 'object') return option.label
+                                return null
+                              })
+                              .join(', ')}
+                          </p>
+                        )}
+                        <div className="text-sm">
+                          {'x'}
+                          {quantity}
+                        </div>
                       </div>
-                    </div>
 
-                    {typeof price === 'number' && <Price amount={price} />}
+                      {typeof price === 'number' && <Price amount={price} />}
+                    </div>
                   </div>
                 </div>
               )
@@ -442,8 +464,10 @@ export const CheckoutPage: React.FC = () => {
           })}
           <hr />
           <div className="flex justify-between items-center gap-2">
-            <span className="uppercase">Total</span>{' '}
-            <Price className="text-3xl font-medium" amount={cart.subtotal || 0} />
+            <span className="uppercase text-base font-semibold">
+              {locale === 'de' ? 'gesamt' : 'Total'}
+            </span>{' '}
+            <Price className="text-2xl font-semibold" amount={cart.subtotal || 0} />
           </div>
         </div>
       )}

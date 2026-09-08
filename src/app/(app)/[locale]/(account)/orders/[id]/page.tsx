@@ -18,7 +18,7 @@ import { AddressItem } from '@/components/addresses/AddressItem'
 export const dynamic = 'force-dynamic'
 
 type PageProps = {
-  params: Promise<{ id: string }>
+  params: Promise<{ locale: 'de' | 'en'; id: string }>
   searchParams: Promise<{ email?: string; accessToken?: string }>
 }
 
@@ -27,7 +27,7 @@ export default async function Order({ params, searchParams }: PageProps) {
   const payload = await getPayload({ config: configPromise })
   const { user } = await payload.auth({ headers })
 
-  const { id } = await params
+  const { locale, id } = await params
   const { email = '', accessToken = '' } = await searchParams
 
   let order: Order | null = null
@@ -114,13 +114,13 @@ export default async function Order({ params, searchParams }: PageProps) {
 
   return (
     <div className="">
-      <div className="flex gap-8 justify-between items-center mb-6">
+      <div className="flex flex-col gap-8 items-start sm:flex-row justify-between sm:items-center mb-6">
         {user ? (
           <div className="flex gap-4">
-            <Button asChild variant="ghost">
-              <Link href="/orders">
+            <Button asChild variant="ghost" className="rounded-none">
+              <Link href={`/${locale}/orders`}>
                 <ChevronLeftIcon />
-                All orders
+                {locale === 'de' ? 'Alle Bestellungen' : 'All orders'}
               </Link>
             </Button>
           </div>
@@ -136,8 +136,10 @@ export default async function Order({ params, searchParams }: PageProps) {
       <div className="bg-card border rounded-lg px-6 py-4 flex flex-col gap-12">
         <div className="flex flex-col gap-6 lg:flex-row lg:justify-between">
           <div className="">
-            <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Order Date</p>
-            <p className="text-lg">
+            <p className="font-mono uppercase text-primary/50 mb-1 text-sm">
+             {locale === 'de' ? 'Bestelldatum' : 'Order Date'}
+            </p>
+            <p className="">
               <time dateTime={order.createdAt}>
                 {formatDateTime({ date: order.createdAt, format: 'MMMM dd, yyyy' })}
               </time>
@@ -145,13 +147,16 @@ export default async function Order({ params, searchParams }: PageProps) {
           </div>
 
           <div className="">
-            <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Total</p>
-            {order.amount && <Price className="text-lg" amount={order.amount} />}
+            <p className="font-mono uppercase text-primary/50 mb-1 text-sm">
+            {locale === 'de' ? 'Gesamt' : 'Total'}
+            </p>
+            {order.amount && <Price className="" amount={order.amount} />}
           </div>
 
           {order.status && (
             <div className="grow max-w-1/3">
-              <p className="font-mono uppercase text-primary/50 mb-1 text-sm">Status</p>
+              <p className="font-mono uppercase text-primary/50 mb-1 text-sm">
+              Status</p>
               <OrderStatus className="text-sm" status={order.status} />
             </div>
           )}
@@ -159,7 +164,9 @@ export default async function Order({ params, searchParams }: PageProps) {
 
         {order.items && (
           <div>
-            <h2 className="font-mono text-primary/50 mb-4 uppercase text-sm">Items</h2>
+            <h2 className="font-mono text-primary/50 mb-4 uppercase text-sm">
+             {locale === 'de' ? 'Artikel' : 'Items'}
+            </h2>
             <ul className="flex flex-col gap-6">
               {order.items?.map((item, index) => {
                 if (typeof item.product === 'string') {
@@ -179,6 +186,7 @@ export default async function Order({ params, searchParams }: PageProps) {
                       product={item.product}
                       quantity={item.quantity}
                       variant={variant}
+                      locale={locale}
                     />
                   </li>
                 )
@@ -189,7 +197,9 @@ export default async function Order({ params, searchParams }: PageProps) {
 
         {order.shippingAddress && (
           <div>
-            <h2 className="font-mono text-primary/50 mb-4 uppercase text-sm">Shipping Address</h2>
+            <h2 className="font-mono text-primary/50 mb-4 uppercase text-sm">
+               {locale === 'de' ? 'Lieferadresse' : 'Shipping Address'}
+            </h2>
 
             {/* @ts-expect-error - some kind of type hell */}
             <AddressItem address={order.shippingAddress} hideActions />

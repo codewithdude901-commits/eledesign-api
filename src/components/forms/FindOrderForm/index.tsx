@@ -17,9 +17,10 @@ type FormData = {
 
 type Props = {
   initialEmail?: string
+  locale: 'de' | 'en'
 }
 
-export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
+export const FindOrderForm: React.FC<Props> = ({ initialEmail, locale }) => {
   const { user } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -60,10 +61,14 @@ export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
   if (success) {
     return (
       <Fragment>
-        <h1 className="text-xl mb-4">Check your email</h1>
+        <h1 className="text-xl mb-4">
+          {locale === 'de' ? 'Überprüfen Sie Ihre E-Mails.' : 'Check your email'}
+          </h1>
         <div className="prose dark:prose-invert">
           <p>
-            {`If an order exists with the provided email and order ID, we've sent you an email with a link to view your order details.`}
+            {locale === 'de'
+              ? 'Falls eine Bestellung mit der angegebenen E-Mail-Adresse und Bestellnummer existiert, haben wir Ihnen eine E-Mail mit einem Link zur Ansicht Ihrer Bestelldetails gesendet.'
+              : 'If an order exists with the provided email and order ID, we have sent you an email with a link to view your order details.'}
           </p>
         </div>
       </Fragment>
@@ -72,25 +77,33 @@ export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
 
   return (
     <Fragment>
-      <h1 className="text-xl mb-4">Find my order</h1>
+      <h1 className="text-xl mb-4">
+        {locale === 'de' ? 'Meine Bestellung finden' : 'Find my order'}
+        </h1>
       <div className="prose dark:prose-invert mb-8">
-        <p>{`Please enter your email and order ID below. We'll send you a link to view your order.`}</p>
+        <p>
+          {locale === 'de'
+            ? 'Bitte geben Sie unten Ihre E-Mail-Adresse und Ihre Bestellnummer ein. Wir senden Ihnen einen Link, über den Sie Ihre Bestellung einsehen können.'
+            : 'Please enter your email and order ID below. We will send you a link to view your order.'}
+          {``}
+        </p>
       </div>
       <form className="max-w-lg flex flex-col gap-8" onSubmit={handleSubmit(onSubmit)}>
         <FormItem>
           <Label htmlFor="email" className="mb-2">
-            Email address
+            {locale === 'de' ? 'E-Mail-Adresse' : 'Email address'}
           </Label>
           <Input
             id="email"
             {...register('email', { required: 'Email is required.' })}
             type="email"
+            className="rounded-none"
           />
           {errors.email && <FormError message={errors.email.message} />}
         </FormItem>
         <FormItem>
           <Label htmlFor="orderID" className="mb-2">
-            Order ID
+            {locale === 'de' ? 'Bestellnummer' : 'Order ID'}
           </Label>
           <Input
             id="orderID"
@@ -98,12 +111,24 @@ export const FindOrderForm: React.FC<Props> = ({ initialEmail }) => {
               required: 'Order ID is required.',
             })}
             type="text"
+            className="rounded-none"
           />
           {errors.orderID && <FormError message={errors.orderID.message} />}
         </FormItem>
         {submitError && <FormError message={submitError} />}
-        <Button type="submit" className="self-start" variant="default" disabled={isSubmitting}>
-          {isSubmitting ? 'Sending...' : 'Find order'}
+        <Button
+          type="submit"
+          className="self-start rounded-none"
+          variant="default"
+          disabled={isSubmitting}
+        >
+          {isSubmitting
+            ? locale === 'de'
+              ? 'Wird gesendet...'
+              : 'Sending...'
+            : locale === 'de'
+              ? 'Bestellung suchen'
+              : 'Find order'}
         </Button>
       </form>
     </Fragment>

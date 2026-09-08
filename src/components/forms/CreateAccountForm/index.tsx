@@ -93,6 +93,7 @@ export const CreateAccountForm: React.FC<{ locale: string }> = ({ locale }) => {
             id="email"
             {...register('email', { required: 'Email is required.' })}
             type="email"
+            className='rounded-none'
           />
           {errors.email && <FormError message={errors.email.message} />}
         </FormItem>
@@ -105,6 +106,7 @@ export const CreateAccountForm: React.FC<{ locale: string }> = ({ locale }) => {
             id="password"
             {...register('password', { required: 'Password is required.' })}
             type="password"
+            className='rounded-none'
           />
           {errors.password && <FormError message={errors.password.message} />}
         </FormItem>
@@ -120,11 +122,12 @@ export const CreateAccountForm: React.FC<{ locale: string }> = ({ locale }) => {
               validate: (value) => value === password.current || 'The passwords do not match',
             })}
             type="password"
+            className='rounded-none'
           />
           {errors.passwordConfirm && <FormError message={errors.passwordConfirm.message} />}
         </FormItem>
       </div>
-      <Button disabled={loading} type="submit" variant="default">
+      <Button disabled={loading} type="submit" variant="default" className='rounded-none'>
         {loading ? (locale === 'de' ? 'Wird verarbeitet' : 'Processing') : (locale === 'de' ? 'Konto erstellen' : 'Create Account')}
       </Button>
 

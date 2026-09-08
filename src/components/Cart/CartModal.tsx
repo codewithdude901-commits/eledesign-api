@@ -26,6 +26,7 @@ import { OpenCartButton } from './OpenCart'
 export function CartModal({ locale }: { locale: 'de' | 'en' }) {
   const { cart } = useCart()
   // const [isOpen, setIsOpen] = useState(false)
+  console.log(cart)
   const { isCartOpen, openCart, closeCart } = useCartUI()
 
   const pathname = usePathname()
@@ -75,7 +76,7 @@ export function CartModal({ locale }: { locale: 'de' | 'en' }) {
           </div>
         ) : (
           <div className="grow flex px-4">
-            <div className="flex flex-col justify-between w-full">
+            <div className="flex flex-col justify-between w-full mb-4">
               <ul className="grow overflow-auto py-4">
                 {cart?.items?.map((item, i) => {
                   const product = item.product
@@ -130,7 +131,7 @@ export function CartModal({ locale }: { locale: 'de' | 'en' }) {
                         </div>
                         <Link
                           className="z-30 flex flex-row space-x-4"
-                          href={`/products/${(item.product as Product)?.slug}`}
+                          href={`/${locale}/products/${(item.product as Product)?.slug}`}
                         >
                           <div className="relative h-16 w-16 cursor-pointer overflow-hidden border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
                             {image?.url && (
@@ -191,8 +192,8 @@ export function CartModal({ locale }: { locale: 'de' | 'en' }) {
                     </div>
                   )}
 
-                  <Button asChild className="bg-emerald-600 hover:bg-emerald-600/90">
-                    <Link className="w-full " href="/checkout">
+                  <Button asChild className="bg-emerald-600 hover:bg-emerald-600/90 rounded-none">
+                    <Link className="w-full " href={`/${locale}/checkout`}>
                       {locale === 'de' ? 'Zur Kasse gehen' : 'Proceed to Checkout'}
                     </Link>
                   </Button>

@@ -88,8 +88,8 @@ export default async function ContactPage({ params }: ContactPageProps) {
   const t = translations[locale as Locale]
 
   return (
-    <main className="min-h-screen  text-stone-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
+    <main className="min-h-screen  text-stone-900 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <header className="max-w-2xl mb-12">
           <h1 className="text-3xl font-semibold leading-tight tracking-tight text-brand-charcoal sm:text-4xl md:text-5xl">

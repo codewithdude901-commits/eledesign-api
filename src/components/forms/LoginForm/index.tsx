@@ -62,6 +62,7 @@ export const LoginForm = ({ locale }: Props) => {
             id="email"
             type="email"
             {...register('email', { required: 'Email is required.' })}
+            className='rounded-none'
           />
           {errors.email && <FormError message={errors.email.message} />}
         </FormItem>
@@ -72,6 +73,7 @@ export const LoginForm = ({ locale }: Props) => {
             id="password"
             type="password"
             {...register('password', { required: 'Please provide a password.' })}
+             className='rounded-none'
           />
           {errors.password && <FormError message={errors.password.message} />}
         </FormItem>
@@ -87,12 +89,12 @@ export const LoginForm = ({ locale }: Props) => {
       </div>
 
       <div className="flex gap-4 justify-between">
-        <Button asChild variant="outline" size="lg">
+        <Button asChild variant="outline" size="lg" className='rounded-none'>
           <Link href={`/${locale}/create-account${allParams}`} className="grow max-w-[50%]">
             {locale === 'de' ? 'Konto erstellen' : 'Create an account'}
           </Link>
         </Button>
-        <Button className="grow" disabled={isLoading} size="lg" type="submit" variant="default">
+        <Button className="grow rounded-none" disabled={isLoading} size="lg" type="submit" variant="default">
           {isLoading ? (locale === 'de' ? 'Verarbeite' : 'Processing') : (locale === 'de' ? 'Weiter' : 'Continue')}
         </Button>
       </div>

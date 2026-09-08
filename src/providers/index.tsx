@@ -19,6 +19,7 @@ export const Providers: React.FC<{
             defaultCurrency: 'EUR',
             supportedCurrencies: [EUR],
           }}
+
           api={{
             cartsFetchQuery: {
               depth: 2,

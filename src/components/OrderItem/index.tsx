@@ -41,7 +41,7 @@ export const OrderItem: React.FC<Props> = ({ order, locale }) => {
         </p>
       </div>
 
-      <Button variant="outline" asChild className="self-start sm:self-auto">
+      <Button variant="outline" asChild className="self-start sm:self-auto rounded-none">
         <Link href={`/orders/${order.id}`}>
           {locale === 'de' ? 'Bestellung ansehen' : 'View Order'}
         </Link>

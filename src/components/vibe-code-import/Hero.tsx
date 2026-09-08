@@ -10,28 +10,13 @@ type HeroProps = {
   locale?: 'de' | 'en'
 }
 
-export const Hero = ({ hero, locale }: HeroProps) => {
+export const Hero = ({ hero }: HeroProps) => {
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [isHovered, setIsHovered] = useState(false)
 
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
-  /*
-   * Payload can return slides as:
-   *
-   * undefined
-   * null
-   * []
-   * [...]
-   *
-   * Normalize everything to an array.
-   */
   const slides = hero?.slides ?? []
 
-  /*
-   * Keep currentIndex valid if the number of slides
-   * changes after the component has rendered.
-   */
   useEffect(() => {
     if (slides.length === 0) {
       setCurrentIndex(0)
@@ -43,9 +28,6 @@ export const Hero = ({ hero, locale }: HeroProps) => {
     }
   }, [slides.length, currentIndex])
 
-  /*
-   * Next slide
-   */
   const nextSlide = useCallback(() => {
     if (slides.length === 0) return
 
@@ -54,9 +36,6 @@ export const Hero = ({ hero, locale }: HeroProps) => {
     })
   }, [slides.length])
 
-  /*
-   * Previous slide
-   */
   const prevSlide = useCallback(() => {
     if (slides.length === 0) return
 
@@ -66,12 +45,10 @@ export const Hero = ({ hero, locale }: HeroProps) => {
   }, [slides.length])
 
   /*
-   * Automatic slide rotation.
-   *
-   * Pauses while the user hovers over the hero.
+   * Automatic slide rotation (uninterrupted continuous playback)
    */
   useEffect(() => {
-    if (slides.length === 0 || isHovered) {
+    if (slides.length === 0) {
       return
     }
 
@@ -83,11 +60,8 @@ export const Hero = ({ hero, locale }: HeroProps) => {
         timerRef.current = null
       }
     }
-  }, [slides.length, isHovered, nextSlide])
+  }, [slides.length, nextSlide])
 
-  /*
-   * No slides configured.
-   */
   if (slides.length === 0) {
     return null
   }
@@ -98,77 +72,40 @@ export const Hero = ({ hero, locale }: HeroProps) => {
     return null
   }
 
-  /*
-   * Payload upload relationship can be either:
-   *
-   * string
-   * or
-   * populated Media object
-   */
   const image = currentSlide.image
-
   const imageUrl = typeof image === 'string' ? image : (image.url ?? '')
-
-  /*
-   * Get the actual image dimensions from Payload.
-   *
-   * Example:
-   *
-   * width  = 1920
-   * height = 800
-   *
-   * aspectRatio = 1920 / 800
-   */
   const imageWidth = typeof image === 'string' ? undefined : image.width
-
   const imageHeight = typeof image === 'string' ? undefined : image.height
-
-  /*
-   * Use the actual image aspect ratio when Payload
-   * has width/height available.
-   *
-   * Fall back to 16:9 when the relationship isn't populated.
-   */
   const aspectRatio = imageWidth && imageHeight ? `${imageWidth} / ${imageHeight}` : '16 / 9'
 
   return (
     <section
       className="relative w-full overflow-hidden select-none max-h-[92vh]"
       style={{ aspectRatio }}
-      // onMouseEnter={() => setIsHovered(true)}
-      // onMouseLeave={() => setIsHovered(false)}
     >
       {/* =========================================================
           SLIDES
           ========================================================= */}
 
-      <div className="absolute inset-0 z-0">
-        <AnimatePresence initial={false}>
+      <div className="absolute inset-0 z-0 bg-stone-900">
+        <AnimatePresence mode="popLayout" initial={false}>
           <motion.div
             key={currentSlide.id ?? currentIndex}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{
-              opacity: {
-                duration: 0.6,
-                ease: 'easeInOut',
-              },
+              duration: 0.8,
+              ease: [0.4, 0, 0.2, 1],
             }}
-            className="absolute inset-0"
+            className="absolute inset-0 w-full h-full"
           >
             {/* Image */}
             <motion.div
-              initial={{
-                scale: 1.05,
-                rotate: 1,
-              }}
-              animate={{
-                scale: 1,
-                rotate: 0,
-              }}
+              initial={{ scale: 1.05 }}
+              animate={{ scale: 1 }}
               transition={{
-                duration: 4,
+                duration: 6,
                 ease: 'easeOut',
               }}
               className="absolute inset-0 h-full w-full"
@@ -184,52 +121,10 @@ export const Hero = ({ hero, locale }: HeroProps) => {
             </motion.div>
 
             {/* Dark overlay */}
-            <div className="absolute inset-0 bg-linear-to-t from-brand-charcoal/20 via-brand-charcoal/30 to-brand-charcoal/10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-black/10" />
           </motion.div>
         </AnimatePresence>
       </div>
-
-      {/* =========================================================
-          SLIDE CONTENT
-          ========================================================= */}
-
-      {/*
-      <div className="absolute bottom-[20%] left-1/2 z-10 flex w-full -translate-x-1/2 justify-center px-4">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide.id ?? currentIndex}
-            initial={{
-              opacity: 0,
-              y: 30,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            exit={{
-              opacity: 0,
-              y: -20,
-            }}
-            transition={{
-              duration: 0.2,
-              delay: 0.2,
-            }}
-            className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4"
-          >
-            {currentSlide.link && (
-              <Link
-                href={currentSlide.link}
-                className="flex w-full items-center justify-center gap-2 bg-green-700 px-6 py-3.5 text-base font-semibold text-brand-cream shadow-lg sm:w-auto"
-              >
-                <span>
-                  {currentSlide.title}
-                </span>
-              </Link>
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-      */}
 
       {/* =========================================================
           DESKTOP NAVIGATION

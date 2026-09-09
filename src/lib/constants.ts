@@ -121,3 +121,45 @@ export const styleFilters = [
     value: 'natural-woodland',
   },
 ]
+
+export const styleTagLabels = {
+  en: {
+    'hot-rocky': 'Hot & Rocky',
+    'mediterranean-fragrant': 'Mediterranean & Fragrant',
+    'romantic-delicate': 'Romantic & Delicate',
+    'elegant-bright': 'Elegant & Bright',
+    'elegant-dark': 'Elegant & Dark',
+    'green-easy': 'Green & Easy-Care',
+    'fiery-lively': 'Fiery & Lively',
+    'wild-tall': 'Wild & Tall',
+    'bright-warm': 'Bright & Warm',
+    'romantic-shaded': 'Romantic & Shaded',
+    'bold-elegant': 'Bold & Elegant',
+    'natural-woodland': 'Natural & Woodland',
+  },
+
+  de: {
+    'hot-rocky': 'Heiß & Felsig',
+    'mediterranean-fragrant': 'Mediterran & Duftend',
+    'romantic-delicate': 'Romantisch & Zart',
+    'elegant-bright': 'Elegant & Hell',
+    'elegant-dark': 'Elegant & Dunkel',
+    'green-easy': 'Grün & Pflegeleicht',
+    'fiery-lively': 'Feurig & Lebendig',
+    'wild-tall': 'Wild & Hoch',
+    'bright-warm': 'Hell & Warm',
+    'romantic-shaded': 'Romantisch & Schattig',
+    'bold-elegant': 'Markant & Elegant',
+    'natural-woodland': 'Natürlich & Waldartig',
+  },
+} as const
+
+type Locale = 'en' | 'de'
+type StyleTag = keyof typeof styleTagLabels.en
+
+export const getStyleTagLabel = (
+  tag: string,
+  locale: Locale,
+): string => {
+  return styleTagLabels[locale][tag as StyleTag] ?? tag
+}

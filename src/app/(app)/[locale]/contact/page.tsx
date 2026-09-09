@@ -92,22 +92,22 @@ export default async function ContactPage({ params }: ContactPageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <header className="max-w-2xl mb-12">
-          <h1 className="text-3xl font-semibold leading-tight tracking-tight text-brand-charcoal sm:text-4xl md:text-5xl">
+          <h1 className="text-3xl font-semibold leading-tight tracking-tight text-stone-900 sm:text-4xl md:text-5xl">
             {t.heading}
           </h1>
-          <p className="text-stone-600 text-lg leading-relaxed">{t.subheading}</p>
+          <p className="text-stone-800 text-lg leading-relaxed">{t.subheading}</p>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Contact Form */}
           <div className="lg:col-span-7 bg-white border border-stone-200 p-6 md:p-10 rounded-none shadow-none">
-            <h2 className="text-xl text-stone-900 mb-8">{t.formTitle}</h2>
+            <h2 className="text-xl mb-8">{t.formTitle}</h2>
 
             <form action="/api/contact" method="POST" className="space-y-8">
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1"
+                  className="block text-xs uppercase tracking-wider text-stone-800 font-medium mb-1"
                 >
                   {t.nameLabel}
                 </label>
@@ -124,7 +124,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1"
+                  className="block text-xs uppercase tracking-wider text-stone-800 font-medium mb-1"
                 >
                   {t.emailLabel}
                 </label>
@@ -141,7 +141,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
               <div>
                 <label
                   htmlFor="subject"
-                  className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1"
+                  className="block text-xs uppercase tracking-wider text-stone-800 font-medium mb-1"
                 >
                   {t.subjectLabel}
                 </label>
@@ -158,7 +158,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
               <div>
                 <label
                   htmlFor="message"
-                  className="block text-xs uppercase tracking-wider text-stone-700 font-medium mb-1"
+                  className="block text-xs uppercase tracking-wider text-stone-800 font-medium mb-1"
                 >
                   {t.messageLabel}
                 </label>
@@ -184,22 +184,22 @@ export default async function ContactPage({ params }: ContactPageProps) {
           {/* Side Details & Social Icons */}
           <aside className="lg:col-span-5 space-y-10 lg:pl-6">
             <div className="space-y-6">
-              <h3 className="text-xs uppercase tracking-widest text-stone-700 font-semibold">
+              <h3 className="text-xs uppercase tracking-widest text-stone-800 font-semibold">
                 {t.contactDetailsTitle}
               </h3>
 
               <div className="border-t border-stone-200 pt-4">
-                <span className="text-xs text-stone-700 uppercase block mb-1">{t.emailTitle}</span>
+                <span className="text-xs text-stone-800 uppercase block mb-1">{t.emailTitle}</span>
                 <a
                   href="mailto:info@eledesign.de"
-                  className="text-stone-900 hover:text-emerald-800 text-lg font-medium transition"
+                  className="text-stone-900 hover:text-emerald-800  text-base font-medium transition"
                 >
                   info@eledesign.de
                 </a>
               </div>
 
               <div className="border-t border-stone-200 pt-4">
-                <span className="text-xs text-stone-700 uppercase block mb-1">
+                <span className="text-xs text-stone-800 uppercase block mb-1">
                   {t.locationTitle}
                 </span>
                 <p className="text-stone-900 text-base font-medium">{t.locationValue}</p>
@@ -207,7 +207,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
             </div>
 
             <div className="space-y-4 border-t border-stone-200 pt-8">
-              <h3 className="text-xs uppercase tracking-widest text-stone-700 font-semibold">
+              <h3 className="text-xs uppercase tracking-widest text-stone-800 font-semibold">
                 {t.socialTitle}
               </h3>
 

@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
       const images = (doc.gallery || [])
         .map((item: any) => {
           const mediaObj = typeof item.image === 'object' ? item.image : null
-          console.log('image object:', mediaObj)
+          // console.log('image object:', mediaObj)
           if (!mediaObj?.url) return null
           return mediaObj.url.startsWith('http') ? mediaObj.url : `${baseUrl}${mediaObj.url}`
         })

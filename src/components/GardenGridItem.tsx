@@ -2,13 +2,14 @@ import type { Product } from '@/payload-types'
 
 import { Media } from '@/components/Media'
 import { Price } from '@/components/Price'
+import { getStyleTagLabel } from '@/lib/constants'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
 type Props = {
   garden: Partial<Product>
-  locale: string
+  locale: 'de' | 'en'
 }
 
 export const GardenGridItem: React.FC<Props> = ({ garden, locale }) => {
@@ -49,7 +50,7 @@ export const GardenGridItem: React.FC<Props> = ({ garden, locale }) => {
             <Media
               resource={image}
               fill
-              className="h-full w-full"
+              className="relative h-full w-full"
               imgClassName="
                 h-full w-full object-cover
                 
@@ -99,12 +100,21 @@ export const GardenGridItem: React.FC<Props> = ({ garden, locale }) => {
               </span>
             )}
 
-            {garden.style_tags?.slice(0, 2).map((tag) => (
+            {/* {garden.style_tags?.slice(0, 2).map((tag) => (
               <span
                 key={tag}
                 className="border border-brand-charcoal/10 bg-brand-charcoal/5 px-2.5 py-1 text-xs font-medium"
               >
                 {tag}
+              </span>
+            ))} */}
+
+            {garden.style_tags?.slice(0, 2).map((tag) => (
+              <span
+                key={tag}
+                className="border border-brand-charcoal/10 bg-brand-charcoal/5 px-2.5 py-1 text-xs font-medium"
+              >
+                {getStyleTagLabel(tag, locale)}
               </span>
             ))}
           </div>

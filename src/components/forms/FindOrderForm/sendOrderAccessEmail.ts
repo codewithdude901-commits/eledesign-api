@@ -1,8 +1,8 @@
 'use server'
 
+import { getServerSideURL } from '@/utilities/getURL'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
-import { getServerSideURL } from '@/utilities/getURL'
 
 type SendOrderAccessEmailArgs = {
   email: string

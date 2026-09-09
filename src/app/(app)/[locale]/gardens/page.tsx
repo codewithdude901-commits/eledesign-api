@@ -32,7 +32,8 @@ export default async function ShopPage({ searchParams, params }: Props) {
     collection: 'products',
     draft: false,
     overrideAccess: false,
-
+    limit: 30,
+    pagination: false,
     select: {
       title: true,
       slug: true,

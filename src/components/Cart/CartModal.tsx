@@ -26,7 +26,7 @@ import { OpenCartButton } from './OpenCart'
 export function CartModal({ locale }: { locale: 'de' | 'en' }) {
   const { cart } = useCart()
   // const [isOpen, setIsOpen] = useState(false)
-  console.log(cart)
+  // console.log(cart)
   const { isCartOpen, openCart, closeCart } = useCartUI()
 
   const pathname = usePathname()

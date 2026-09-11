@@ -1,4 +1,3 @@
-import { NeighborbriteEmbed } from '@/components/NeighborbriteEmbed'
 import { FeaturedGardens } from '@/components/vibe-code-import/FeaturedGardens'
 import { Hero } from '@/components/vibe-code-import/Hero'
 import { PathSelector } from '@/components/vibe-code-import/PathSelector'

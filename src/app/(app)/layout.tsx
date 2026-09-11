@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react'
 
+import { GoogleTagManager } from '@/components/Analytics/GoogleTagManager'
+import { ConsentManager } from '@/components/Consent/ConsentManager'
 import { Footer } from '@/components/Footer'
 import { Navbar } from '@/components/Navbar'
 import { Providers } from '@/providers'
 import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
 import './globals.css'
-import { ConsentManager } from '@/components/Consent/ConsentManager'
-import { GoogleTagManager } from '@/components/Analytics/GoogleTagManager'
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -22,7 +22,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </head>
       <body>
         <ConsentManager />
-         <GoogleTagManager />
+        <GoogleTagManager />
         <Providers>
           <Navbar />
           <main>{children}</main>

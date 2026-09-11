@@ -1917,7 +1917,14 @@ export interface HomePage {
   hero?: {
     slides?:
       | {
+          /**
+           * Desktop image (default asset across all screen sizes)
+           */
           image: string | Media;
+          /**
+           * Optional mobile image variant (used for small screens)
+           */
+          mobileImage?: (string | null) | Media;
           title?: string | null;
           description?: string | null;
           link?: string | null;
@@ -2036,6 +2043,7 @@ export interface HomePageSelect<T extends boolean = true> {
           | T
           | {
               image?: T;
+              mobileImage?: T;
               title?: T;
               description?: T;
               link?: T;

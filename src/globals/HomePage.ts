@@ -21,6 +21,18 @@ export const HomePage: GlobalConfig = {
               type: 'upload',
               relationTo: 'media',
               required: true,
+              admin: {
+                description: 'Desktop image (default asset across all screen sizes)',
+              },
+            },
+            {
+              name: 'mobileImage',
+              type: 'upload',
+              relationTo: 'media',
+              required: false,
+              admin: {
+                description: 'Optional mobile image variant (used for small screens)',
+              },
             },
             {
               name: 'title',

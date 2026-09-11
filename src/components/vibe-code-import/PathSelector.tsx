@@ -22,17 +22,40 @@ type PathSelectorProps = {
 }
 
 export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale }) => {
-  const [position, setPosition] = useState<number>(50) // percentage (0 to 100)
+  const [position, setPosition] = useState<number>(50)
   const [isDragging, setIsDragging] = useState<boolean>(false)
-  const containerRef = useRef<HTMLDivElement>(null)
 
-  const handleMove = useCallback((clientX: number) => {
-    if (!containerRef.current) return
-    const rect = containerRef.current.getBoundingClientRect()
-    const x = clientX - rect.left
-    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100))
-    setPosition(percentage)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const clipOverlayRef = useRef<HTMLDivElement>(null)
+  const handleRef = useRef<HTMLDivElement>(null)
+  
+  // Ref to cache container geometry during dragging to eliminate layout thrashing
+  const rectRef = useRef<DOMRect | null>(null)
+
+  const updatePositionUI = useCallback((pct: number) => {
+    if (clipOverlayRef.current) {
+      clipOverlayRef.current.style.clipPath = `inset(0 ${100 - pct}% 0 0)`
+    }
+    if (handleRef.current) {
+      handleRef.current.style.left = `${pct}%`
+    }
   }, [])
+
+  const handleMove = useCallback(
+    (clientX: number) => {
+      if (!rectRef.current) return
+      const rect = rectRef.current
+      const x = clientX - rect.left
+      const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100))
+      
+      // Update DOM directly for 60fps/120fps smooth interaction
+      updatePositionUI(percentage)
+      
+      // Store current percentage value in ref
+      containerRef.current?.setAttribute('data-position', percentage.toString())
+    },
+    [updatePositionUI],
+  )
 
   const handleTouchMove = useCallback(
     (e: TouchEvent) => {
@@ -54,11 +77,17 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false)
+    // Sync React state once dragging ends
+    const finalPos = containerRef.current?.getAttribute('data-position')
+    if (finalPos) {
+      setPosition(parseFloat(finalPos))
+    }
+    rectRef.current = null
   }, [])
 
   useEffect(() => {
     if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove)
+      window.addEventListener('mousemove', handleMouseMove, { passive: true })
       window.addEventListener('mouseup', handleMouseUp)
       window.addEventListener('touchmove', handleTouchMove, { passive: true })
       window.addEventListener('touchend', handleMouseUp)
@@ -73,14 +102,15 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
   }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove])
 
   const startDrag = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault()
+    if (containerRef.current) {
+      // Cache element dimensions once at drag start
+      rectRef.current = containerRef.current.getBoundingClientRect()
+    }
     setIsDragging(true)
   }
 
   return (
     <section className="relative py-20 lg:py-28 overflow-hidden">
-      {/* Decorative Subtle Ambient Blobs */}
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14 lg:mb-18">
@@ -91,7 +121,7 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
             transition={{ duration: 0.4 }}
             className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-500/30 text-xs font-bold uppercase tracking-widest mb-4 shadow-sm"
           >
-            <Trees className="w-3.5 h-3.5 " />
+            <Trees className="w-3.5 h-3.5" />
             <span>{pathSelector?.sub_title}</span>
           </motion.div>
 
@@ -108,24 +138,25 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
 
         {/* Dual Cards Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-stretch">
-          {/* CARD B: AI Photo Generator (Powered by Neighborbrite) */}
+          {/* CARD A: AI Photo Generator */}
           <motion.div
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="group relative  bg-white border border-brand-charcoal/10 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 flex flex-col justify-between"
+            className="group relative bg-white border border-brand-charcoal/10 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 flex flex-col justify-between"
           >
             {/* Top Image Banner with Before/After AI Transformation Overlay */}
             <div
               ref={containerRef}
-              className="relative h-64 sm:h-80 lg:h-72 w-full overflow-hidden cursor-ew-resize select-none"
+              className="relative h-64 sm:h-80 lg:h-72 w-full overflow-hidden cursor-ew-resize select-none touch-none"
+              onMouseDown={startDrag}
+              onTouchStart={startDrag}
             >
               {/* BEFORE IMAGE (Background) */}
               <div className="absolute inset-0 w-full h-full">
                 <img
                   src="/after1.jpg"
-
                   alt="Bare concrete balcony before transformation"
                   className="w-full h-full object-cover object-top pointer-events-none"
                 />
@@ -133,12 +164,12 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
 
               {/* AFTER IMAGE (Foreground Overlay with CSS clip-path) */}
               <div
-                className="absolute inset-0 h-full w-full pointer-events-none"
+                ref={clipOverlayRef}
+                className="absolute inset-0 h-full w-full pointer-events-none will-change-[clip-path]"
                 style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
               >
                 <img
                   src="/before1.jpg"
-
                   alt="Lush green garden balcony after transformation"
                   className="w-full h-full object-cover object-top pointer-events-none absolute inset-0"
                 />
@@ -146,10 +177,9 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
 
               {/* SLIDER HANDLE LINE & THUMB BUTTON */}
               <div
-                className="absolute top-0 bottom-0 z-20 w-1 bg-white/70 backdrop-blur-xs cursor-ew-resize flex items-center justify-center"
+                ref={handleRef}
+                className="absolute top-0 bottom-0 z-20 w-1 bg-white/70 backdrop-blur-xs cursor-ew-resize flex items-center justify-center will-change-[left]"
                 style={{ left: `${position}%` }}
-                onMouseDown={startDrag}
-                onTouchStart={startDrag}
               >
                 {/* Floating Grip Button */}
                 <div className="w-8 h-8 rounded-full bg-white/80 border border-brand-charcoal/15 shadow-md flex items-center justify-center transition-transform duration-200 active:scale-95">
@@ -160,9 +190,8 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
 
             {/* Card Content */}
             <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between space-y-4">
-              {/* Floating AI Visual Mockup Tag */}
-              <div className=" flex items-end justify-between">
-                <h3 className="text-2xl sm:text-3xl font-extrabold  mt-1 drop-shadow-sm text-sky-800">
+              <div className="flex items-end justify-between">
+                <h3 className="text-2xl sm:text-3xl font-extrabold mt-1 drop-shadow-sm text-sky-800">
                   {pathSelector?.paths && pathSelector?.paths[1]?.title}
                 </h3>
               </div>
@@ -174,29 +203,26 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
               <div className="space-y-2.5 pt-2">
                 <div className="flex items-center gap-3 font-medium">
                   <Upload className="w-4.5 h-4.5 text-orange-500 shrink-0" />
-
                   <span>
                     {pathSelector?.paths &&
                       pathSelector?.paths[1]?.list &&
-                      pathSelector?.paths[1]?.list[0].item}
+                      pathSelector?.paths[1]?.list[0]?.item}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 font-medium">
                   <Zap className="w-4.5 h-4.5 text-indigo-500 shrink-0" />
-
                   <span>
                     {pathSelector?.paths &&
                       pathSelector?.paths[1]?.list &&
-                      pathSelector?.paths[1]?.list[1].item}
+                      pathSelector?.paths[1]?.list[1]?.item}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 font-medium">
                   <CheckCircle2 className="w-4.5 h-4.5 text-green-800 shrink-0" />
-
                   <span>
                     {pathSelector?.paths &&
                       pathSelector?.paths[1]?.list &&
-                      pathSelector?.paths[1]?.list[2].item}
+                      pathSelector?.paths[1]?.list[2]?.item}
                   </span>
                 </div>
               </div>
@@ -217,13 +243,14 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
               </div>
             </div>
           </motion.div>
-          {/* CARD A: Readymade Outdoor Concepts */}
+
+          {/* CARD B: Readymade Outdoor Concepts */}
           <motion.div
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="group relative  bg-white border border-brand-charcoal/10 overflow-hidden shadow-sm hover:shadow-lg  transition-all duration-500 flex flex-col justify-between"
+            className="group relative bg-white border border-brand-charcoal/10 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 flex flex-col justify-between"
           >
             {/* Top Image Banner */}
             <div className="relative h-64 sm:h-80 lg:h-72 w-full overflow-hidden">
@@ -247,11 +274,11 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
               {/* Feature Highlights */}
               <div className="space-y-2.5 pt-2">
                 <div className="flex items-center gap-3 font-medium">
-                  <CheckCircle2 className="w-5 h-5 shrink-0 text-blue-600 " />
+                  <CheckCircle2 className="w-5 h-5 shrink-0 text-blue-600" />
                   <span>
                     {pathSelector?.paths &&
                       pathSelector?.paths[0]?.list &&
-                      pathSelector?.paths[0]?.list[0].item}
+                      pathSelector?.paths[0]?.list[0]?.item}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 font-medium">
@@ -259,7 +286,7 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
                   <span>
                     {pathSelector?.paths &&
                       pathSelector?.paths[0]?.list &&
-                      pathSelector?.paths[0]?.list[1].item}
+                      pathSelector?.paths[0]?.list[1]?.item}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 font-medium">
@@ -267,7 +294,7 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
                   <span>
                     {pathSelector?.paths &&
                       pathSelector?.paths[0]?.list &&
-                      pathSelector?.paths[0]?.list[2].item}
+                      pathSelector?.paths[0]?.list[2]?.item}
                   </span>
                 </div>
               </div>
@@ -276,7 +303,7 @@ export const PathSelector: React.FC<PathSelectorProps> = ({ pathSelector, locale
               <div className="pt-4 border-t border-brand-charcoal/10 flex flex-col sm:flex-row items-center gap-3">
                 <Link
                   href={`/${locale}/gardens`}
-                  className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-green-700 text-white font-bold  shadow-md transition-all hover:scale-[1] active:scale-[0.99] text-center sm:text-left"
+                  className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-green-700 text-white font-bold shadow-md transition-all hover:scale-[1] active:scale-[0.99] text-center sm:text-left"
                 >
                   <span>
                     {locale === 'de'

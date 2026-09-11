@@ -12,7 +12,6 @@ type HeroProps = {
 
 export const Hero = ({ hero }: HeroProps) => {
   const [currentIndex, setCurrentIndex] = useState(0)
-
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   const slides = hero?.slides ?? []
@@ -31,28 +30,22 @@ export const Hero = ({ hero }: HeroProps) => {
   const nextSlide = useCallback(() => {
     if (slides.length === 0) return
 
-    setCurrentIndex((prevIndex) => {
-      return (prevIndex + 1) % slides.length
-    })
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length)
   }, [slides.length])
 
   const prevSlide = useCallback(() => {
     if (slides.length === 0) return
 
-    setCurrentIndex((prevIndex) => {
-      return (prevIndex - 1 + slides.length) % slides.length
-    })
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + slides.length) % slides.length)
   }, [slides.length])
 
   /*
    * Automatic slide rotation (uninterrupted continuous playback)
    */
   useEffect(() => {
-    if (slides.length === 0) {
-      return
-    }
+    if (slides.length === 0) return
 
-    timerRef.current = setInterval(nextSlide, 6000)
+    timerRef.current = setInterval(nextSlide, 5000)
 
     return () => {
       if (timerRef.current) {
@@ -62,27 +55,23 @@ export const Hero = ({ hero }: HeroProps) => {
     }
   }, [slides.length, nextSlide])
 
-  if (slides.length === 0) {
-    return null
-  }
+  if (slides.length === 0) return null
 
   const currentSlide = slides[currentIndex]
+  if (!currentSlide) return null
 
-  if (!currentSlide) {
-    return null
-  }
+  // Extract Desktop Image
+  const desktopImg = currentSlide.image
+  const rawDesktopUrl = typeof desktopImg === 'string' ? desktopImg : (desktopImg?.url ?? '')
+  const desktopUrl = rawDesktopUrl ? encodeURI(rawDesktopUrl) : ''
 
-  const image = currentSlide.image
-  const imageUrl = typeof image === 'string' ? image : (image.url ?? '')
-  const imageWidth = typeof image === 'string' ? undefined : image.width
-  const imageHeight = typeof image === 'string' ? undefined : image.height
-  const aspectRatio = imageWidth && imageHeight ? `${imageWidth} / ${imageHeight}` : '16 / 9'
+  // Extract Mobile Image (fallback to Desktop Image if not provided)
+  const mobileImg = currentSlide.mobileImage
+  const rawMobileUrl = typeof mobileImg === 'string' ? mobileImg : (mobileImg?.url ?? desktopUrl)
+  const mobileUrl = rawMobileUrl ? encodeURI(rawMobileUrl) : desktopUrl
 
   return (
-    <section
-      className="relative w-full overflow-hidden select-none max-h-[92vh]"
-      style={{ aspectRatio }}
-    >
+    <section className="relative w-full overflow-hidden select-none aspect-4/5 sm:aspect-video max-h-[92vh]">
       {/* =========================================================
           SLIDES
           ========================================================= */}
@@ -100,7 +89,7 @@ export const Hero = ({ hero }: HeroProps) => {
             }}
             className="absolute inset-0 w-full h-full"
           >
-            {/* Image */}
+            {/* Image Container with Zoom */}
             <motion.div
               initial={{ scale: 1.05 }}
               animate={{ scale: 1 }}
@@ -110,18 +99,23 @@ export const Hero = ({ hero }: HeroProps) => {
               }}
               className="absolute inset-0 h-full w-full"
             >
-              {imageUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={imageUrl}
-                  alt={currentSlide.title ?? ''}
-                  className="h-full w-full object-cover"
-                />
+              {desktopUrl && (
+                <picture className="block h-full w-full">
+                  {/* Mobile Image Source */}
+                  {mobileUrl && <source media="(max-width: 639px)" srcSet={mobileUrl} />}
+                  {/* Desktop / Fallback Image */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={desktopUrl}
+                    alt={currentSlide.title ?? ''}
+                    className="h-full w-full object-cover"
+                  />
+                </picture>
               )}
             </motion.div>
 
             {/* Dark overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-black/10" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/20 to-black/10" />
           </motion.div>
         </AnimatePresence>
       </div>

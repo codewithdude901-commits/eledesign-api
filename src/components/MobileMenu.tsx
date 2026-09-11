@@ -106,11 +106,11 @@ export function MobileMenu({ menu, locale }: MobileMenuProps) {
           <div>
             <h2 className="text-xl mb-4">{locale === 'de' ? 'Mein Konto' : 'My account'}</h2>
             <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-              <Button asChild className="w-full sm:flex-1" variant="outline">
+              <Button asChild className="w-full sm:flex-1 rounded-none" variant="outline">
                 <Link href={`/${locale}/login`}>{locale === 'de' ? 'Anmelden' : 'Log in'}</Link>
               </Button>
               <span className="text-center text-sm text-muted-foreground sm:text-base">or</span>
-              <Button asChild className="w-full sm:flex-1">
+              <Button asChild className="w-full sm:flex-1 rounded-none">
                 <Link href={`/${locale}/create-account`}>
                   {locale === 'de' ? 'Konto erstellen' : 'Create an account'}
                 </Link>

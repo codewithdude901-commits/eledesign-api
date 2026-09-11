@@ -15,25 +15,30 @@ type Props = {
 }
 
 export function AddToCart({ product }: Props) {
-  const { addItem, cart, isLoading, refreshCart } = useCart()
+  const { addItem, cart, isLoading } = useCart()
   const { openCart } = useCartUI()
 
   const params = useParams<{ locale: 'de' | 'en' }>()
-
   const locale = params.locale
+
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  // Track auto-add loading state specifically for direct URL execution (?add=1)
   const [isAutoAdding, setIsAutoAdding] = useState(false)
 
-  // Prevent ?add=1 from executing more than once
+  /**
+   * Prevent the ?add=1 effect from running more than once.
+   */
   const autoAddTriggered = useRef(false)
 
   const variants = product.variants?.docs || []
 
-  /*
-   * Find the selected variant from ?variant=...
+  /**
+   * Find the variant selected in the URL.
+   *
+   * Example:
+   * ?garden_area=6a95709912a1aa600b75ff80
+   * &variant=6a9570ac12a1aa600b75ffb7
    */
   const selectedVariant = useMemo<Variant | undefined>(() => {
     if (!product.enableVariants || !variants.length) {
@@ -61,10 +66,14 @@ export function AddToCart({ product }: Props) {
     return undefined
   }, [product.enableVariants, variants, searchParams])
 
-  /*
-   * Normal add-to-cart operation.
+  /**
+   * Add the current product/variant to the Payload cart.
    *
-   * This uses Payload's EcommerceProvider.
+   * IMPORTANT:
+   * Payload's addItem() automatically refreshes the cart using
+   * the guest cart secret when necessary.
+   *
+   * Therefore we should NOT call refreshCart() afterwards.
    */
   const addProductToCart = useCallback(async () => {
     await addItem({
@@ -73,8 +82,8 @@ export function AddToCart({ product }: Props) {
     })
   }, [addItem, product.id, selectedVariant?.id])
 
-  /*
-   * Normal "Add To Cart" button.
+  /**
+   * Normal "Add to Cart" button.
    */
   const handleAddToCart = useCallback(
     async (e: React.FormEvent<HTMLButtonElement>) => {
@@ -83,104 +92,129 @@ export function AddToCart({ product }: Props) {
       try {
         await addProductToCart()
 
-        toast.success(locale === 'de' ? 'Artikel zum Warenkorb hinzugefügt.' : 'Item added to cart.')
-        openCart()
-      } catch (error) {
-        console.error('Failed to add item to cart:', error)
-        toast.error('Failed to add item to cart.')
-      }
-    },
-    [addProductToCart, openCart],
-  )
-
-  /*
-   * Special external hand-off flow.
-   *
-   * Example:
-   * /products/garden-1?variant=XYZ&add=1
-   */
-  const autoAddProduct = useCallback(async () => {
-    if (!cart?.id) {
-      throw new Error('Cart has not been restored yet.')
-    }
-
-    const cartSecret = localStorage.getItem('cart_secret')
-
-    const response = await fetch(`/api/carts/${cart.id}/add-item`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        item: {
-          product: product.id,
-          variant: selectedVariant?.id ?? undefined,
-        },
-        quantity: 1,
-        secret: cartSecret || undefined,
-      }),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-
-      throw new Error(`Failed to add item to existing cart: ${errorText}`)
-    }
-
-    const result = await response.json()
-
-    if (!result.success) {
-      throw new Error(result.message || 'Failed to add item to existing cart.')
-    }
-
-    return result
-  }, [cart?.id, product.id, selectedVariant?.id])
-
-  /*
-   * Automatically add product when ?add=1 exists.
-   */
-  useEffect(() => {
-    const shouldAutoAdd = searchParams.get('add') === '1'
-
-    if (!shouldAutoAdd) return
-    if (autoAddTriggered.current) return
-
-    // Show loading state while waiting for Payload cart restoration or adding
-    setIsAutoAdding(true)
-
-    if (isLoading) return
-
-    // Wait until Payload has restored the existing cart.
-    if (!cart) return
-
-    // Variant products need a selected variant.
-    if (product.enableVariants && !selectedVariant) return
-
-    autoAddTriggered.current = true
-
-    const run = async () => {
-      try {
-        await autoAddProduct()
-
-        // Refresh Payload's cart state.
-        await refreshCart()
-
-        // Remove ?add=1 to prevent another automatic add.
-        const params = new URLSearchParams(searchParams.toString())
-        params.delete('add')
-
-        router.replace(
-          `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}`,
+        toast.success(
+          locale === 'de' ? 'Artikel zum Warenkorb hinzugefügt.' : 'Item added to cart.',
         )
 
         openCart()
       } catch (error) {
-        console.error('Cannot auto-add product:', error)
+        console.error('Failed to add item to cart:', error)
 
+        toast.error(
+          locale === 'de'
+            ? 'Artikel konnte nicht zum Warenkorb hinzugefügt werden.'
+            : 'Failed to add item to cart.',
+        )
+      }
+    },
+    [addProductToCart, locale, openCart],
+  )
+
+  /**
+   * Automatically add the product when Neighborbrite redirects
+   * the customer to:
+   *
+   * /products/slug?
+   * garden_area=...&
+   * variant=...&
+   * add=1
+   *
+   * We wait for Payload's cart to be restored before calling addItem().
+   */
+  useEffect(() => {
+    const shouldAutoAdd = searchParams.get('add') === '1'
+
+    if (!shouldAutoAdd) {
+      return
+    }
+
+    /**
+     * Don't run the automatic add more than once.
+     */
+    if (autoAddTriggered.current) {
+      return
+    }
+
+    /**
+     * Payload EcommerceProvider restores the cart asynchronously.
+     *
+     * If we call addItem() before the cart has been restored,
+     * Payload may think there is no existing cart and create
+     * another cart.
+     */
+    if (isLoading) {
+      return
+    }
+
+    if (!cart) {
+      return
+    }
+
+    /**
+     * Variant products must have a valid variant selected.
+     */
+    if (product.enableVariants && !selectedVariant) {
+      return
+    }
+
+    /**
+     * Mark it as triggered BEFORE starting the async operation.
+     * This prevents duplicate calls caused by rerenders.
+     */
+    autoAddTriggered.current = true
+    setIsAutoAdding(true)
+
+    const run = async () => {
+      try {
+        /**
+         * Payload addItem():
+         *
+         * 1. Uses the existing cart.
+         * 2. Sends the guest cart secret when required.
+         * 3. Adds the product/variant.
+         * 4. Refreshes the cart using the same secret.
+         *
+         * Do NOT call refreshCart() here.
+         */
+        await addProductToCart()
+
+        /**
+         * Remove only ?add=1 from the URL.
+         *
+         * Keep:
+         * - garden_area
+         * - variant
+         * - nb_client_id
+         * - any other query parameters
+         */
+        const updatedParams = new URLSearchParams(searchParams.toString())
+
+        updatedParams.delete('add')
+
+        const queryString = updatedParams.toString()
+
+        router.replace(`${window.location.pathname}${queryString ? `?${queryString}` : ''}`, {
+          scroll: false,
+        })
+
+        /**
+         * Open the cart drawer after the item has been added.
+         */
+        openCart()
+      } catch (error) {
+        console.error('Cannot automatically add product to cart:', error)
+
+        /**
+         * Allow the effect to try again if the operation actually
+         * throws an error.
+         */
         autoAddTriggered.current = false
 
-        toast.error('Unable to add item to cart.')
+        toast.error(
+          locale === 'de'
+            ? 'Artikel konnte nicht zum Warenkorb hinzugefügt werden.'
+            : 'Unable to add item to cart.',
+        )
       } finally {
         setIsAutoAdding(false)
       }
@@ -193,72 +227,106 @@ export function AddToCart({ product }: Props) {
     isLoading,
     product.enableVariants,
     selectedVariant,
-    autoAddProduct,
-    refreshCart,
+    addProductToCart,
     router,
     openCart,
+    locale,
   ])
 
-  /*
-   * Determine whether the normal Add To Cart button
-   * should be disabled.
+  /**
+   * Determine whether the currently selected product/variant
+   * cannot be added.
    */
-  const disabled = useMemo<boolean>(() => {
-    const existingItem = cart?.items?.find((item) => {
-      const productID = typeof item.product === 'object' ? item.product?.id : item.product
-
-      const variantID = item.variant
-        ? typeof item.variant === 'object'
-          ? item.variant?.id
-          : item.variant
-        : undefined
-
-      if (productID === product.id) {
-        if (product.enableVariants) {
-          return variantID === selectedVariant?.id
-        }
-
-        return true
-      }
-
-      return false
-    })
-
-    if (existingItem) {
-      const existingQuantity = existingItem.quantity || 0
-
-      if (product.enableVariants) {
-        return existingQuantity >= (selectedVariant?.inventory || 0)
-      }
-
-      return existingQuantity >= (product.inventory || 0)
-    }
-
+  const disabled = useMemo(() => {
+    /**
+     * Variant product
+     */
     if (product.enableVariants) {
+      /**
+       * No variant selected.
+       */
       if (!selectedVariant) {
         return true
       }
 
-      if (selectedVariant.inventory === 0) {
+      /**
+       * Variant has no inventory.
+       */
+      if (typeof selectedVariant.inventory === 'number' && selectedVariant.inventory <= 0) {
         return true
       }
-    } else if (product.inventory === 0) {
+
+      /**
+       * Check whether this variant already exists in the cart.
+       */
+      const existingItem = cart?.items?.find((item) => {
+        const itemProduct = typeof item.product === 'object' ? item.product.id : item.product
+
+        const itemVariant = typeof item.variant === 'object' ? item.variant.id : item.variant
+
+        return (
+          String(itemProduct) === String(product.id) &&
+          String(itemVariant) === String(selectedVariant.id)
+        )
+      })
+
+      if (existingItem) {
+        const quantity = existingItem.quantity || 0
+
+        if (
+          typeof selectedVariant.inventory === 'number' &&
+          quantity >= selectedVariant.inventory
+        ) {
+          return true
+        }
+      }
+
+      return false
+    }
+
+    /**
+     * Non-variant product.
+     */
+    if (typeof product.inventory === 'number' && product.inventory <= 0) {
       return true
     }
 
+    /**
+     * Check whether the product already exists in the cart.
+     */
+    const existingItem = cart?.items?.find((item) => {
+      const itemProduct = typeof item.product === 'object' ? item.product.id : item.product
+
+      return String(itemProduct) === String(product.id) && !item.variant
+    })
+
+    if (existingItem) {
+      const quantity = existingItem.quantity || 0
+
+      if (typeof product.inventory === 'number' && quantity >= product.inventory) {
+        return true
+      }
+    }
+
     return false
-  }, [selectedVariant, cart?.items, product])
+  }, [cart, product, selectedVariant])
 
   return (
     <>
-      {/* Full-screen loading overlay when direct URL purchase (?add=1) is processing */}
+      {/**
+       * Full-screen overlay while Neighborbrite's
+       * ?add=1 flow is adding the item.
+       */}
       {isAutoAdding && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/40 backdrop-blur-xs text-white">
-          <div className="flex flex-col items-center gap-3 bg-stone-900/90 p-6 shadow-xl border border-stone-800">
-            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
-            <p className="text-sm font-medium">
-              {locale === 'de' ? 'Warenkorb wird aktualisiert...' : 'Adding product to cart...'}
-            </p>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <div className="flex items-center gap-3 rounded-lg bg-white px-6 py-4 shadow-xl">
+            <Loader2 className="h-5 w-5 animate-spin" />
+
+            <span>
+              {locale === 'de'
+                ? 'Artikel wird zum Warenkorb hinzugefügt...'
+                : 'Adding item to cart...'}
+            </span>
           </div>
         </div>
       )}
@@ -267,17 +335,18 @@ export function AddToCart({ product }: Props) {
         aria-label="Add to cart"
         variant="outline"
         className={clsx({
-          'rounded-none hover:opacity-90 bg-emerald-600 hover:bg-emerald-600 text-white min-w-40': true,
+          'opacity-50': disabled,
         })}
         disabled={disabled || isLoading || isAutoAdding}
         onClick={handleAddToCart}
         type="submit"
       >
         {isAutoAdding ? (
-          <span className="inline-flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+
             {locale === 'de' ? 'Wird hinzugefügt...' : 'Adding...'}
-          </span>
+          </>
         ) : locale === 'de' ? (
           'In den Warenkorb legen'
         ) : (

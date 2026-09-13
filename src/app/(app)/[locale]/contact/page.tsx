@@ -214,7 +214,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
               <div className="flex items-center space-x-4 pt-2">
                 {/* Instagram Icon */}
                 <a
-                  href="https://instagram.com"
+                  href="https://www.instagram.com/eledesign2026"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"

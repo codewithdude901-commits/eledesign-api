@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const payload = await getPayload({ config })
-    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'https://eledesign.de'
+    const baseUrl = 'https://media.eledesign.de'
 
     // 2. Fetch all products marked for sync with ALL locales
     const productsRes = await payload.find({
@@ -45,12 +45,24 @@ export async function GET(req: NextRequest) {
     // 3. Map Payload documents to Neighborbrite JSON schema
     const feed = productsRes.docs.map((doc: any) => {
       // Map gallery image uploads to full URLs
+      // const images = (doc.gallery || [])
+      //   .map((item: any) => {
+      //     const mediaObj = typeof item.image === 'object' ? item.image : null
+
+      //     if (!mediaObj?.url) return null
+      //     return mediaObj.url.startsWith('http') ? mediaObj.url : `${baseUrl}${mediaObj.url}`
+      //   })
+      //   .filter(Boolean)
+
       const images = (doc.gallery || [])
         .map((item: any) => {
           const mediaObj = typeof item.image === 'object' ? item.image : null
-          // console.log('image object:', mediaObj)
+
           if (!mediaObj?.url) return null
-          return mediaObj.url.startsWith('http') ? mediaObj.url : `${baseUrl}${mediaObj.url}`
+
+          const url = encodeURI(mediaObj.url)
+
+          return url.startsWith('http') ? url : `${baseUrl}${url}`
         })
         .filter(Boolean)
 

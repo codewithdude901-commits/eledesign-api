@@ -53,7 +53,7 @@ export const AccountNav: React.FC<Props> = ({ className }) => {
             asChild
             variant="link"
             className={clsx('text-primary/70 hover:text-primary hover:no-underline', {
-              'text-primary': pathname === `/${locale}/account/orders` || pathname === '/orders',
+              'text-primary': pathname.includes(`/orders`),
             })}
           >
             <Link href={`/${locale}/orders`}>{locale === 'de' ? 'Bestellungen' : 'Orders'}</Link>

@@ -233,7 +233,31 @@ export const Footer: React.FC = () => {
               href={`/${locale}/impressum`}
               className="hover:text-neutral-900 transition-colors"
             >
-              {locale === 'de' ? 'Impressum' : 'Legal Notice (Impressum)'}
+              {locale === 'de' ? 'Impressum' : 'Legal Notice'}
+            </Link>
+
+            <span className="opacity-50">•</span>
+
+            <Link href={`/${locale}/terms`} className="hover:text-neutral-900 transition-colors">
+              {locale === 'de' ? 'AGB' : 'Terms & Conditions'}
+            </Link>
+
+            <span className="opacity-50">•</span>
+
+            <Link
+              href={`/${locale}/cancellation-policy`}
+              className="hover:text-neutral-900 transition-colors"
+            >
+              {locale === 'de' ? 'Widerrufsbelehrung' : 'Right of Withdrawal'}
+            </Link>
+
+            <span className="opacity-50">•</span>
+
+            <Link
+              href={`/${locale}/shipping-payment`}
+              className="hover:text-neutral-900 transition-colors"
+            >
+              {locale === 'de' ? 'Versand & Zahlung' : 'Shipping & Payment'}
             </Link>
           </div>
 

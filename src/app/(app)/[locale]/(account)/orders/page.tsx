@@ -11,7 +11,7 @@ import { redirect } from 'next/navigation'
 
 type Props = {
   params: Promise<{
-    locale: string
+    locale: 'de' | 'en'
   }>
 }
 

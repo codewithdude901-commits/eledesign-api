@@ -334,7 +334,7 @@ export function AddToCart({ product }: Props) {
       <Button
         aria-label="Add to cart"
         variant="outline"
-        className={clsx({
+        className={clsx('rounded-none', {
           'opacity-50': disabled,
         })}
         disabled={disabled || isLoading || isAutoAdding}

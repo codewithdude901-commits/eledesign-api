@@ -2,11 +2,14 @@
 
 import { Message } from '@/components/Message'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import { Address } from '@/payload-types'
 import { useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import { useRouter } from 'next/navigation'
-import React, { FormEvent, useCallback } from 'react'
+import Link from 'next/link'
+import { useParams, useRouter } from 'next/navigation'
+import React, { FormEvent, useCallback, useState } from 'react'
 
 type Props = {
   customerEmail?: string
@@ -24,13 +27,28 @@ export const CheckoutForm: React.FC<Props> = ({
   const elements = useElements()
   const [error, setError] = React.useState<null | string>(null)
   const [isLoading, setIsLoading] = React.useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false)
+
   const router = useRouter()
+  const params = useParams<{ locale: 'de' | 'en' }>()
+  const locale = params?.locale || 'de'
+
   const { clearCart } = useCart()
   const { confirmOrder } = usePayments()
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault()
+
+      if (!termsAccepted) {
+        setError(
+          locale === 'de'
+            ? 'Bitte stimmen Sie den AGB und der Widerrufsbelehrung zu.'
+            : 'Please agree to the Terms & Conditions and Right of Withdrawal.',
+        )
+        return
+      }
+
       setIsLoading(true)
       setProcessingPayment(true)
 
@@ -89,14 +107,10 @@ export const CheckoutForm: React.FC<Props> = ({
                 const queryString = queryParams.toString()
                 const redirectUrl = `/orders/${confirmResult.orderID}${queryString ? `?${queryString}` : ''}`
 
-                // Clear the cart after successful payment
                 clearCart()
-
-                // Redirect to order confirmation page
                 router.push(redirectUrl)
               }
             } catch (err) {
-              // console.log({ err })
               const msg = err instanceof Error ? err.message : 'Something went wrong.'
               setError(`Error while confirming order: ${msg}`)
               setIsLoading(false)
@@ -115,6 +129,8 @@ export const CheckoutForm: React.FC<Props> = ({
       }
     },
     [
+      termsAccepted,
+      locale,
       setProcessingPayment,
       stripe,
       elements,
@@ -135,17 +151,83 @@ export const CheckoutForm: React.FC<Props> = ({
   return (
     <form onSubmit={handleSubmit}>
       {error && <Message error={error} />}
+
       <PaymentElement
         options={{ layout: { type: 'accordion', defaultCollapsed: false, radios: true } }}
       />
-      <div className="mt-8 flex gap-4">
+
+      <div className="mt-6 flex items-start gap-3">
+        <Checkbox
+          id="terms"
+          checked={termsAccepted}
+          onCheckedChange={(checked) => setTermsAccepted(Boolean(checked))}
+          className="rounded-none mt-1"
+        />
+        <Label htmlFor="terms" className="text-xs leading-normal cursor-pointer font-normal">
+          {locale === 'de' ? (
+            <>
+              Ich habe die{' '}
+              <Link
+                href={`/${locale}/terms`}
+                target="_blank"
+                className="underline underline-offset-2 font-medium hover:text-black"
+              >
+                AGB
+              </Link>{' '}
+              und die{' '}
+              <Link
+                href={`/${locale}/cancellation-policy`}
+                target="_blank"
+                className="underline underline-offset-2 font-medium hover:text-black"
+              >
+                Widerrufsbelehrung
+              </Link>{' '}
+              gelesen und stimme diesen ausdrücklich zu.
+            </>
+          ) : (
+            <>
+              I have read and agree to the{' '}
+              <Link
+                href={`/${locale}/terms`}
+                target="_blank"
+                className="underline underline-offset-2 font-medium hover:text-black"
+              >
+                Terms &amp; Conditions
+              </Link>{' '}
+              and the{' '}
+              <Link
+                href={`/${locale}/cancellation-policy`}
+                target="_blank"
+                className="underline underline-offset-2 font-medium hover:text-black"
+              >
+                Right of Withdrawal
+              </Link>
+              .
+            </>
+          )}
+        </Label>
+      </div>
+
+      <p className="mt-4 text-xs text-muted-foreground">
+        {locale === 'de'
+          ? 'Alle Preise enthalten die gesetzliche MwSt. zzgl. Versandkosten.'
+          : 'All prices include statutory VAT plus shipping fees.'}
+      </p>
+
+      <div className="mt-6 flex gap-4">
         <Button
-          disabled={!stripe || isLoading} 
+          disabled={!stripe || isLoading || !termsAccepted}
           type="submit"
           variant="default"
           className="rounded-none min-w-40"
         >
-          {isLoading ? 'Loading...' : 'Pay now'}
+          {isLoading
+            ? locale === 'de'
+              ? 'Wird verarbeitet...'
+              : 'Processing...'
+            : locale === 'de'
+              ? 'Jetzt kaufen'
+              : 'Buy now'}
         </Button>
       </div>
     </form>

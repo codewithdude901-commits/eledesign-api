@@ -224,7 +224,13 @@ export async function GET(req: NextRequest) {
             quantity: Math.max(1, plantQty),
           }
         })
+        // const totalQuantity = items.reduce((total, item) => {
+        //   return total + item.quantity
+        // }, 0)
 
+        // console.log('Bundle:', productDe.title)
+        // console.log('Area:', areaSqm, 'm²')
+        // console.log('Total quantity:', totalQuantity)
         const priceAmount = ((variant.priceInEUR || productDe.priceInEUR) / 100).toFixed(2)
 
         const urlParams = new URLSearchParams()

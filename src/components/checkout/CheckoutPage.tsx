@@ -29,6 +29,67 @@ import { toast } from 'sonner'
 const apiKey = `${process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}`
 const stripe = loadStripe(apiKey)
 
+const i18n = {
+  de: {
+    contact: 'Kontakt',
+    login: 'Anmelden',
+    or: 'oder',
+    createAccount: 'ein Konto erstellen',
+    notYou: 'Du nicht?',
+    logout: 'Abmelden',
+    guestCheckoutInstructions: 'Geben Sie Ihre E-Mail-Adresse ein, um als Gast zur Kasse zu gehen.',
+    emailAddress: 'E-Mail-Adresse',
+    continueAsGuest: 'Als Gast fortfahren',
+    address: 'Adresse',
+    remove: 'Entfernen',
+    billingAddress: 'Rechnungsadresse',
+    shippingSameAsBilling: 'Lieferadresse entspricht der Rechnungsadresse.',
+    shippingAddress: 'Lieferadresse',
+    shippingAddressDescription: 'Bitte wählen Sie eine Lieferadresse aus.',
+    goToPayment: 'Zur Zahlung',
+    tryAgain: 'Versuchen Sie es erneut',
+    payment: 'Zahlung',
+    errorPrefix: 'Fehler:',
+    cancelPayment: 'Zahlung stornieren',
+    yourCart: 'Ihr Warenkorb',
+    total: 'gesamt',
+    processingPayment: 'Ihre Zahlung wird verarbeitet...',
+    cartEmpty: 'Ihr Warenkorb ist leer.',
+    continueShopping: 'Weiter einkaufen?',
+    defaultErrorMessage: 'Bei der Einleitung der Zahlung ist ein Fehler aufgetreten.',
+    outOfStockMessage: 'Ein oder mehrere Artikel in Ihrem Warenkorb sind nicht mehr auf Lager.',
+  },
+  en: {
+    contact: 'Contact',
+    login: 'Log in',
+    or: 'or',
+    createAccount: 'create an account',
+    notYou: 'Not you?',
+    logout: 'Log out',
+    guestCheckoutInstructions: 'Enter your email to checkout as a guest.',
+    emailAddress: 'Email Address',
+    continueAsGuest: 'Continue as guest',
+    address: 'Address',
+    remove: 'Remove',
+    billingAddress: 'Billing address',
+    shippingSameAsBilling: 'Shipping is the same as billing',
+    shippingAddress: 'Shipping address',
+    shippingAddressDescription: 'Please select a shipping address.',
+    goToPayment: 'Go to payment',
+    tryAgain: 'Try again',
+    payment: 'Payment',
+    errorPrefix: 'Error:',
+    cancelPayment: 'Cancel payment',
+    yourCart: 'Your cart',
+    total: 'Total',
+    processingPayment: 'Processing your payment...',
+    cartEmpty: 'Your cart is empty.',
+    continueShopping: 'Continue shopping?',
+    defaultErrorMessage: 'An error occurred while initiating payment.',
+    outOfStockMessage: 'One or more items in your cart are out of stock.',
+  },
+}
+
 export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
   const router = useRouter()
@@ -37,7 +98,9 @@ export const CheckoutPage: React.FC = () => {
   const { theme } = useTheme()
   const params = useParams<{ locale: 'de' | 'en' }>()
 
-  const locale = params.locale
+  const locale = params.locale === 'de' ? 'de' : 'en'
+  const t = i18n[locale]
+
   /**
    * State to manage the email input for guest checkout.
    */
@@ -95,17 +158,17 @@ export const CheckoutPage: React.FC = () => {
         }
       } catch (error) {
         const errorData = error instanceof Error ? JSON.parse(error.message) : {}
-        let errorMessage = 'An error occurred while initiating payment.'
+        let errorMessage = t.defaultErrorMessage
 
         if (errorData?.cause?.code === 'OutOfStock') {
-          errorMessage = 'One or more items in your cart are out of stock.'
+          errorMessage = t.outOfStockMessage
         }
 
         setError(errorMessage)
         toast.error(errorMessage)
       }
     },
-    [billingAddress, billingAddressSameAsShipping, shippingAddress],
+    [billingAddress, billingAddressSameAsShipping, shippingAddress, t],
   )
 
   if (!stripe) return null
@@ -114,7 +177,7 @@ export const CheckoutPage: React.FC = () => {
     return (
       <div className="py-12 w-full items-center justify-center">
         <div className="prose dark:prose-invert text-center max-w-none self-center mb-8">
-          <p>Processing your payment...</p>
+          <p>{t.processingPayment}</p>
         </div>
         <LoadingSpinner />
       </div>
@@ -124,8 +187,8 @@ export const CheckoutPage: React.FC = () => {
   if (cartIsEmpty) {
     return (
       <div className="prose dark:prose-invert py-12 w-full items-center">
-        <p>Your cart is empty.</p>
-        <Link href="/search">Continue shopping?</Link>
+        <p>{t.cartEmpty}</p>
+        <Link href="/search">{t.continueShopping}</Link>
       </div>
     )
   }
@@ -133,18 +196,16 @@ export const CheckoutPage: React.FC = () => {
   return (
     <div className="flex flex-col items-stretch justify-stretch my-8 md:flex-row grow gap-10 md:gap-6 lg:gap-8">
       <div className="basis-full lg:basis-2/3 flex flex-col gap-8 justify-stretch">
-        <h2 className="font-medium text-3xl">{locale === 'de' ? 'Kontakt' : 'Contact'}</h2>
+        <h2 className="font-medium text-3xl">{t.contact}</h2>
         {!user && (
           <div className=" bg-accent dark:bg-black rounded-lg p-4 w-full flex items-center">
             <div className="prose dark:prose-invert">
               <Button asChild className="no-underline text-inherit rounded-none" variant="outline">
-                <Link href={`/${locale}/login`}>Log in</Link>
+                <Link href={`/${locale}/login`}>{t.login}</Link>
               </Button>
               <p className="mt-0">
-                <span className="mx-2">or</span>
-                <Link href={`/${locale}/create-account`}>
-                  {locale === 'de' ? 'ein Konto erstellen' : 'create an account'}
-                </Link>
+                <span className="mx-2">{t.or}</span>
+                <Link href={`/${locale}/create-account`}>{t.createAccount}</Link>
               </p>
             </div>
           </div>
@@ -154,9 +215,9 @@ export const CheckoutPage: React.FC = () => {
             <div>
               <p>{user.email}</p>{' '}
               <p>
-                {locale === 'de' ? 'Du nicht?' : 'Not you?'}{' '}
+                {t.notYou}{' '}
                 <Link className="underline" href={`/${locale}/logout`}>
-                  {locale === 'de' ? 'Abmelden' : 'Log out'}
+                  {t.logout}
                 </Link>
               </p>
             </div>
@@ -164,16 +225,10 @@ export const CheckoutPage: React.FC = () => {
         ) : (
           <div className="bg-accent dark:bg-black rounded-lg p-4 ">
             <div>
-              <p className="mb-4">
-                {locale === 'de'
-                  ? 'Geben Sie Ihre E-Mail-Adresse ein, um als Gast zur Kasse zu gehen.'
-                  : 'Enter your email to checkout as a guest.'}
-              </p>
+              <p className="mb-4">{t.guestCheckoutInstructions}</p>
 
               <FormItem className="mb-6">
-                <Label htmlFor="email">
-                  {locale === 'de' ? 'E-Mail-Adresse' : 'Email Address'}
-                </Label>
+                <Label htmlFor="email">{t.emailAddress}</Label>
                 <Input
                   disabled={!emailEditable}
                   id="email"
@@ -194,13 +249,13 @@ export const CheckoutPage: React.FC = () => {
                 variant="default"
                 className="rounded-none"
               >
-                {locale === 'de' ? 'Als Gast fortfahren' : 'Continue as guest'}
+                {t.continueAsGuest}
               </Button>
             </div>
           </div>
         )}
 
-        <h2 className="font-medium text-3xl">{locale === 'de' ? 'Adresse' : 'Address'}</h2>
+        <h2 className="font-medium text-3xl">{t.address}</h2>
 
         {billingAddress ? (
           <div>
@@ -216,7 +271,7 @@ export const CheckoutPage: React.FC = () => {
                   }}
                   className="rounded-none"
                 >
-                  {locale === 'de' ? 'Entfernen' : 'Remove'}
+                  {t.remove}
                 </Button>
               }
               address={billingAddress}
@@ -224,7 +279,7 @@ export const CheckoutPage: React.FC = () => {
           </div>
         ) : user ? (
           <CheckoutAddresses
-            heading={locale === 'de' ? 'Rechnungsadresse' : 'Billing address'}
+            heading={t.billingAddress}
 
             setAddress={setBillingAddress}
             locale={locale}
@@ -250,11 +305,7 @@ export const CheckoutPage: React.FC = () => {
             }}
             className="rounded-none"
           />
-          <Label htmlFor="shippingTheSameAsBilling">
-            {locale === 'de'
-              ? 'Lieferadresse entspricht der Rechnungsadresse.'
-              : 'Shipping is the same as billing'}
-          </Label>
+          <Label htmlFor="shippingTheSameAsBilling">{t.shippingSameAsBilling}</Label>
         </div>
 
         {!billingAddressSameAsShipping && (
@@ -273,7 +324,7 @@ export const CheckoutPage: React.FC = () => {
                       }}
                       className="rounded-none"
                     >
-                      {locale === 'de' ? 'Entfernen' : 'Remove'}
+                      {t.remove}
                     </Button>
                   }
                   address={shippingAddress}
@@ -283,8 +334,8 @@ export const CheckoutPage: React.FC = () => {
               <CheckoutAddresses
                 locale={locale}
 
-                heading={locale === 'de' ? 'Lieferadresse' : 'Shipping address'}
-                description="Please select a shipping address."
+                heading={t.shippingAddress}
+                description={t.shippingAddressDescription}
                 setAddress={setShippingAddress}
               />
             ) : (
@@ -309,7 +360,7 @@ export const CheckoutPage: React.FC = () => {
               void initiatePaymentIntent('stripe')
             }}
           >
-            {locale === 'de' ? 'Zur Zahlung' : 'Go to payment'}
+            {t.goToPayment}
           </Button>
         )}
 
@@ -325,7 +376,7 @@ export const CheckoutPage: React.FC = () => {
               variant="default"
               className="rounded-none"
             >
-              {locale === 'de' ? 'Versuchen Sie es erneut' : 'Try again'}
+              {t.tryAgain}
             </Button>
           </div>
         )}
@@ -334,8 +385,8 @@ export const CheckoutPage: React.FC = () => {
           {/* @ts-ignore */}
           {paymentData && paymentData?.['clientSecret'] && (
             <div className="pb-16">
-              <h2 className="font-medium text-3xl">Payment</h2>
-              {error && <p>{`Error: ${error}`}</p>}
+              <h2 className="font-medium text-3xl">{t.payment}</h2>
+              {error && <p>{`${t.errorPrefix} ${error}`}</p>}
               <Elements
                 options={{
                   appearance: {
@@ -371,10 +422,10 @@ export const CheckoutPage: React.FC = () => {
                   />
                   <Button
                     variant="outline"
-                    className="self-start rounded-none"
+                    className="self-start rounded-none min-w-40"
                     onClick={() => setPaymentData(null)}
                   >
-                    {locale === 'de' ? 'Zahlung stornieren' : 'Cancel payment'}
+                    {t.cancelPayment}
                   </Button>
                 </div>
               </Elements>
@@ -385,7 +436,7 @@ export const CheckoutPage: React.FC = () => {
 
       {!cartIsEmpty && (
         <div className="basis-full lg:basis-1/3 lg:pl-8 p-4 border-none bg-primary/5 flex flex-col gap-8 ">
-          <h2 className="text-3xl font-medium">Your cart</h2>
+          <h2 className="text-3xl font-medium">{t.yourCart}</h2>
           {cart?.items?.map((item, index) => {
             if (typeof item.product === 'object' && item.product) {
               const {
@@ -464,9 +515,7 @@ export const CheckoutPage: React.FC = () => {
           })}
           <hr />
           <div className="flex justify-between items-center gap-2">
-            <span className="uppercase text-base font-semibold">
-              {locale === 'de' ? 'gesamt' : 'Total'}
-            </span>{' '}
+            <span className="uppercase text-base font-semibold">{t.total}</span>{' '}
             <Price className="text-2xl font-semibold" amount={cart.subtotal || 0} />
           </div>
         </div>

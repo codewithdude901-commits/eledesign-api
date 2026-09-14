@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import type { Product, Variant } from '@/payload-types'
+import { useCartInitialization } from '@/providers/CartInitialization'
 import { useCartUI } from '@/providers/CartUIContext'
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import clsx from 'clsx'
@@ -16,6 +17,7 @@ type Props = {
 
 export function AddToCart({ product }: Props) {
   const { addItem, cart, isLoading } = useCart()
+  const { isCartInitialized } = useCartInitialization()
   const { openCart } = useCartUI()
 
   const params = useParams<{ locale: 'de' | 'en' }>()
@@ -26,19 +28,12 @@ export function AddToCart({ product }: Props) {
 
   const [isAutoAdding, setIsAutoAdding] = useState(false)
 
-  /**
-   * Prevent the ?add=1 effect from running more than once.
-   */
   const autoAddTriggered = useRef(false)
 
   const variants = product.variants?.docs || []
 
   /**
-   * Find the variant selected in the URL.
-   *
-   * Example:
-   * ?garden_area=6a95709912a1aa600b75ff80
-   * &variant=6a9570ac12a1aa600b75ffb7
+   * Find the selected variant from the URL.
    */
   const selectedVariant = useMemo<Variant | undefined>(() => {
     if (!product.enableVariants || !variants.length) {
@@ -67,13 +62,7 @@ export function AddToCart({ product }: Props) {
   }, [product.enableVariants, variants, searchParams])
 
   /**
-   * Add the current product/variant to the Payload cart.
-   *
-   * IMPORTANT:
-   * Payload's addItem() automatically refreshes the cart using
-   * the guest cart secret when necessary.
-   *
-   * Therefore we should NOT call refreshCart() afterwards.
+   * Add the product / selected variant to the cart.
    */
   const addProductToCart = useCallback(async () => {
     await addItem({
@@ -83,7 +72,7 @@ export function AddToCart({ product }: Props) {
   }, [addItem, product.id, selectedVariant?.id])
 
   /**
-   * Normal "Add to Cart" button.
+   * Handle manual Add To Cart button.
    */
   const handleAddToCart = useCallback(
     async (e: React.FormEvent<HTMLButtonElement>) => {
@@ -111,15 +100,27 @@ export function AddToCart({ product }: Props) {
   )
 
   /**
-   * Automatically add the product when Neighborbrite redirects
-   * the customer to:
+   * Automatically add the product when ?add=1 is present.
    *
-   * /products/slug?
-   * garden_area=...&
-   * variant=...&
-   * add=1
+   * IMPORTANT:
    *
-   * We wait for Payload's cart to be restored before calling addItem().
+   * We wait for CartInitialization before calling addItem().
+   *
+   * This prevents the following race:
+   *
+   *   localStorage has an existing cart
+   *          ↓
+   *   EcommerceProvider is restoring it
+   *          ↓
+   *   cartID is temporarily undefined
+   *          ↓
+   *   addItem() is called too early
+   *          ↓
+   *   EcommerceProvider creates a NEW cart
+   *
+   * For a brand-new guest with no stored cart,
+   * CartInitialization immediately becomes true and
+   * addItem() is allowed to create the first cart.
    */
   useEffect(() => {
     const shouldAutoAdd = searchParams.get('add') === '1'
@@ -129,63 +130,44 @@ export function AddToCart({ product }: Props) {
     }
 
     /**
-     * Don't run the automatic add more than once.
+     * Prevent duplicate automatic additions.
      */
     if (autoAddTriggered.current) {
       return
     }
 
     /**
-     * Payload EcommerceProvider restores the cart asynchronously.
-     *
-     * If we call addItem() before the cart has been restored,
-     * Payload may think there is no existing cart and create
-     * another cart.
+     * Wait until EcommerceProvider has finished the relevant
+     * cart initialization.
+     */
+    if (!isCartInitialized) {
+      return
+    }
+
+    /**
+     * Don't start another cart operation while one is running.
      */
     if (isLoading) {
       return
     }
 
-    if (!cart) {
-      return
-    }
-
     /**
-     * Variant products must have a valid variant selected.
+     * A product with variants requires a valid selected variant.
      */
     if (product.enableVariants && !selectedVariant) {
       return
     }
 
-    /**
-     * Mark it as triggered BEFORE starting the async operation.
-     * This prevents duplicate calls caused by rerenders.
-     */
     autoAddTriggered.current = true
     setIsAutoAdding(true)
 
     const run = async () => {
       try {
-        /**
-         * Payload addItem():
-         *
-         * 1. Uses the existing cart.
-         * 2. Sends the guest cart secret when required.
-         * 3. Adds the product/variant.
-         * 4. Refreshes the cart using the same secret.
-         *
-         * Do NOT call refreshCart() here.
-         */
         await addProductToCart()
 
         /**
-         * Remove only ?add=1 from the URL.
-         *
-         * Keep:
-         * - garden_area
-         * - variant
-         * - nb_client_id
-         * - any other query parameters
+         * Remove ?add=1 from the URL after the item has
+         * been successfully submitted to the cart.
          */
         const updatedParams = new URLSearchParams(searchParams.toString())
 
@@ -198,15 +180,14 @@ export function AddToCart({ product }: Props) {
         })
 
         /**
-         * Open the cart drawer after the item has been added.
+         * Open the cart after adding the product.
          */
         openCart()
       } catch (error) {
         console.error('Cannot automatically add product to cart:', error)
 
         /**
-         * Allow the effect to try again if the operation actually
-         * throws an error.
+         * Allow another attempt if the operation fails.
          */
         autoAddTriggered.current = false
 
@@ -223,7 +204,7 @@ export function AddToCart({ product }: Props) {
     void run()
   }, [
     searchParams,
-    cart,
+    isCartInitialized,
     isLoading,
     product.enableVariants,
     selectedVariant,
@@ -234,30 +215,26 @@ export function AddToCart({ product }: Props) {
   ])
 
   /**
-   * Determine whether the currently selected product/variant
-   * cannot be added.
+   * Determine whether the Add To Cart button should be disabled.
    */
   const disabled = useMemo(() => {
     /**
-     * Variant product
+     * Products with variants.
      */
     if (product.enableVariants) {
-      /**
-       * No variant selected.
-       */
       if (!selectedVariant) {
         return true
       }
 
       /**
-       * Variant has no inventory.
+       * Variant is out of stock.
        */
       if (typeof selectedVariant.inventory === 'number' && selectedVariant.inventory <= 0) {
         return true
       }
 
       /**
-       * Check whether this variant already exists in the cart.
+       * Find the same product + variant in the cart.
        */
       const existingItem = cart?.items?.find((item) => {
         const itemProduct = typeof item.product === 'object' ? item.product.id : item.product
@@ -273,6 +250,9 @@ export function AddToCart({ product }: Props) {
       if (existingItem) {
         const quantity = existingItem.quantity || 0
 
+        /**
+         * Don't allow quantity to exceed inventory.
+         */
         if (
           typeof selectedVariant.inventory === 'number' &&
           quantity >= selectedVariant.inventory
@@ -285,14 +265,15 @@ export function AddToCart({ product }: Props) {
     }
 
     /**
-     * Non-variant product.
+     * Products without variants.
      */
+
     if (typeof product.inventory === 'number' && product.inventory <= 0) {
       return true
     }
 
     /**
-     * Check whether the product already exists in the cart.
+     * Find the product in the cart.
      */
     const existingItem = cart?.items?.find((item) => {
       const itemProduct = typeof item.product === 'object' ? item.product.id : item.product
@@ -303,6 +284,9 @@ export function AddToCart({ product }: Props) {
     if (existingItem) {
       const quantity = existingItem.quantity || 0
 
+      /**
+       * Don't allow quantity to exceed inventory.
+       */
       if (typeof product.inventory === 'number' && quantity >= product.inventory) {
         return true
       }
@@ -313,10 +297,6 @@ export function AddToCart({ product }: Props) {
 
   return (
     <>
-      {/**
-       * Full-screen overlay while Neighborbrite's
-       * ?add=1 flow is adding the item.
-       */}
       {isAutoAdding && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/20 backdrop-blur-sm">
           <div className="flex items-center gap-3 rounded-lg bg-white px-6 py-4 shadow-xl">

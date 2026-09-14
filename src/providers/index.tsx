@@ -3,6 +3,7 @@ import { EcommerceProvider, EUR } from '@payloadcms/plugin-ecommerce/client/reac
 import { stripeAdapterClient } from '@payloadcms/plugin-ecommerce/payments/stripe'
 import React from 'react'
 
+import { CartInitialization } from './CartInitialization'
 import { SonnerProvider } from '@/providers/Sonner'
 import { CartUIProvider } from './CartUIContext'
 
@@ -14,6 +15,7 @@ export const Providers: React.FC<{
       <AuthProvider>
         <SonnerProvider />
         <EcommerceProvider
+          syncLocalStorage={true}
           enableVariants={true}
           currenciesConfig={{
             defaultCurrency: 'EUR',
@@ -44,7 +46,7 @@ export const Providers: React.FC<{
             }),
           ]}
         >
-          {children}
+          <CartInitialization>{children}</CartInitialization>
         </EcommerceProvider>
       </AuthProvider>
     </CartUIProvider>

@@ -45,7 +45,7 @@ export const Hero = ({ hero }: HeroProps) => {
   useEffect(() => {
     if (slides.length === 0) return
 
-    timerRef.current = setInterval(nextSlide, 5000)
+    timerRef.current = setInterval(nextSlide, 12000)
 
     return () => {
       if (timerRef.current) {
@@ -94,7 +94,7 @@ export const Hero = ({ hero }: HeroProps) => {
               initial={{ scale: 1.05 }}
               animate={{ scale: 1 }}
               transition={{
-                duration: 6,
+                duration: 10,
                 ease: 'easeOut',
               }}
               className="absolute inset-0 h-full w-full"
@@ -115,7 +115,7 @@ export const Hero = ({ hero }: HeroProps) => {
             </motion.div>
 
             {/* Dark overlay */}
-            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/20 to-black/10" />
+            {/* <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/20 to-black/10" /> */}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -128,7 +128,7 @@ export const Hero = ({ hero }: HeroProps) => {
         <button
           type="button"
           onClick={prevSlide}
-          className="absolute left-6 top-1/2 z-20 -translate-y-1/2 rounded-full border border-white/10 bg-white/5 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none cursor-pointer"
+          className="absolute left-6 top-1/2 z-20 -translate-y-1/2 rounded-full border border-white/10 bg-white/5 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none cursor-pointer opacity-70"
           aria-label="Previous Slide"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -137,7 +137,7 @@ export const Hero = ({ hero }: HeroProps) => {
         <button
           type="button"
           onClick={nextSlide}
-          className="absolute right-6 top-1/2 z-20 -translate-y-1/2 rounded-full border border-white/10 bg-white/5 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none cursor-pointer"
+          className="absolute right-6 top-1/2 z-20 -translate-y-1/2 rounded-full border border-white/10 bg-white/5 p-3 text-white backdrop-blur-md transition-all hover:bg-white/15 focus:outline-none cursor-pointer  opacity-70"
           aria-label="Next Slide"
         >
           <ChevronRight className="h-6 w-6" />

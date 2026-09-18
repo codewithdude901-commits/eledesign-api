@@ -40,13 +40,28 @@ export const Footer: React.FC = () => {
         {/* 4-Column Layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12 pb-16">
           {/* Column 1: Brand story & Socials */}
-          <div className="lg:col-span-">
+          <div className="">
             <div className="flex items-center gap-2 -ml-5 -mt-5">
               <img
                 src={'/logo.jpeg'}
                 className="w-full max-w-40 md:max-w-52 h-auto  ml-2 md:ml-0 "
               />
             </div>
+            {locale === 'de' ? (
+              <p className="mb-2 text-black/90">
+                Präsentiert von{' '}
+                <a href="https://www.stauden-peters.de">
+                  <strong className="text-blue-500">Stauden Peters </strong>
+                </a>
+              </p>
+            ) : (
+              <p className="mb-2 text-black/90">
+                Powered by{' '}
+                <a href="https://www.stauden-peters.de/en">
+                  <strong className="text-blue-500">Stauden Peters </strong>
+                </a>
+              </p>
+            )}
 
             <p className={`text-sm leading-relaxed  max-w-sm mb-4`}>
               {locale === 'de'

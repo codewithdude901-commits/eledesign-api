@@ -1,6 +1,7 @@
 import { ecommercePlugin, EUR } from '@payloadcms/plugin-ecommerce'
 import { stripeAdapter } from '@payloadcms/plugin-ecommerce/payments/stripe'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
+import { importExportPlugin } from '@payloadcms/plugin-import-export'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -13,8 +14,36 @@ import { customerOnlyFieldAccess } from '@/access/customerOnlyFieldAccess'
 import { isAdmin } from '@/access/isAdmin'
 import { isDocumentOwner } from '@/access/isDocumentOwner'
 import { ProductsCollection } from '@/collections/Products'
+import { populateOrderProductNames } from '@/hooks/populateOrderProductNames'
 import { Page, Product } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+
+type UnknownRecord = Record<string, unknown>
+
+const asRecord = (value: unknown): UnknownRecord | null => {
+  if (typeof value !== 'object' || value === null) return null
+  return value as UnknownRecord
+}
+
+const formatOrderDate = (value: unknown): string => {
+  if (typeof value !== 'string' && typeof value !== 'number') {
+    return ''
+  }
+
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) return ''
+
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Europe/Berlin',
+  }).format(date)
+}
 
 const generateTitle: GenerateTitle<Product | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} ` : 'Eledesign Ecommerce Store'
@@ -90,29 +119,43 @@ export const plugins: Plugin[] = [
     orders: {
       ordersCollectionOverride: ({ defaultCollection }) => ({
         ...defaultCollection,
-        fields: [
-          ...defaultCollection.fields,
-          {
-            name: 'accessToken',
-            type: 'text',
-            unique: true,
-            index: true,
-            admin: {
-              position: 'sidebar',
-              readOnly: true,
-            },
-            hooks: {
-              beforeValidate: [
-                ({ value, operation }) => {
-                  if (operation === 'create' || !value) {
-                    return crypto.randomUUID()
+        fields: defaultCollection.fields.map((field) => {
+          if (field.type !== 'tabs') return field
+
+          return {
+            ...field,
+            tabs: field.tabs.map((tab) => ({
+              ...tab,
+              fields: tab.fields.map((tabField) => {
+                if ('name' in tabField && tabField.name === 'items' && tabField.type === 'array') {
+                  return {
+                    ...tabField,
+                    fields: [
+                      {
+                        name: 'product_name',
+                        type: 'text',
+                        label: 'Product Name',
+                        admin: {
+                          readOnly: true,
+                        },
+                      },
+                      ...tabField.fields,
+                    ],
                   }
-                  return value
-                },
-              ],
-            },
-          },
-        ],
+                }
+
+                return tabField
+              }),
+            })),
+          }
+        }),
+        hooks: {
+          ...defaultCollection.hooks,
+          beforeChange: [
+            ...(defaultCollection.hooks?.beforeChange ?? []),
+            populateOrderProductNames,
+          ],
+        },
       }),
     },
     payments: {
@@ -182,5 +225,87 @@ export const plugins: Plugin[] = [
       endpoint: process.env.R2_ENDPOINT,
       forcePathStyle: true,
     },
+  }),
+  importExportPlugin({
+    collections: [
+      {
+        slug: 'orders',
+
+        export: {
+          format: 'csv',
+          disableJobsQueue: true,
+
+          hooks: {
+            before: ({ data, originalData }) => {
+              return data.map((_, index) => {
+                const order = asRecord(originalData[index]) ?? {}
+
+                const items = Array.isArray(order.items) ? order.items : []
+
+                const products: string[] = []
+                const variants: string[] = []
+                const quantities: string[] = []
+
+                for (const item of items) {
+                  const product = asRecord(item)
+
+                  if (!product) continue
+
+                  const productName =
+                    typeof product.product_name === 'string'
+                      ? product.product_name
+                      : 'Unknown product'
+
+                  const variant = asRecord(product.variant)
+
+                  const variantName = typeof variant?.title === 'string' ? variant.title : ''
+
+                  const quantity = Number(product.quantity) || 1
+
+                  products.push(productName)
+                  variants.push(variantName)
+                  quantities.push(String(quantity))
+                }
+
+                const customer = asRecord(order.customer)
+                const shipping = asRecord(order.shippingAddress)
+
+                return {
+                  orderId: String(order.id ?? ''),
+
+                  orderDate: formatOrderDate(order.createdAt),
+
+                  customerEmail: String(order.customerEmail ?? '') || String(customer?.email ?? ''),
+
+                  products: products.join('; '),
+                  variants: variants.join('; '),
+                  quantities: quantities.join('; '),
+
+                  orderTotal:
+                    typeof order.amount === 'number' ? (order.amount / 100).toFixed(2) : '',
+                  currency: String(order.currency ?? ''),
+
+                  title: String(shipping?.title ?? ''),
+                  firstName: String(shipping?.firstName ?? ''),
+                  lastName: String(shipping?.lastName ?? ''),
+                  company: String(shipping?.company ?? ''),
+                  addressLine1: String(shipping?.addressLine1 ?? ''),
+                  addressLine2: String(shipping?.addressLine2 ?? ''),
+                  city: String(shipping?.city ?? ''),
+                  state: String(shipping?.state ?? ''),
+                  postalCode: String(shipping?.postalCode ?? ''),
+                  country: String(shipping?.country ?? ''),
+                  phone: shipping?.phone ? `${String(shipping.phone)}` : '',
+
+                  status: String(order.status ?? ''),
+                }
+              })
+            },
+          },
+        },
+
+        import: false,
+      },
+    ],
   }),
 ]

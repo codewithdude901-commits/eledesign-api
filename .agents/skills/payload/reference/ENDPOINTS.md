@@ -478,7 +478,7 @@ import type { CollectionConfig } from 'payload'
 export const Orders: CollectionConfig = {
   slug: 'orders',
   fields: [
-    /* ... */
+    /* ... */ 
   ],
   endpoints: [
     {

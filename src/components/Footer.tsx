@@ -50,14 +50,14 @@ export const Footer: React.FC = () => {
             {locale === 'de' ? (
               <p className="mb-2 text-black/90">
                 Präsentiert von{' '}
-                <a href="https://www.stauden-peters.de">
+                <a href="https://www.stauden-peters.de" target="_blank">
                   <strong className="text-blue-500">Stauden Peters </strong>
                 </a>
               </p>
             ) : (
               <p className="mb-2 text-black/90">
                 Powered by{' '}
-                <a href="https://www.stauden-peters.de/en">
+                <a href="https://www.stauden-peters.de/en" target="_blank">
                   <strong className="text-blue-500">Stauden Peters </strong>
                 </a>
               </p>

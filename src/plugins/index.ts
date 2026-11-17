@@ -1,20 +1,28 @@
 import { ecommercePlugin, EUR } from '@payloadcms/plugin-ecommerce'
 import { stripeAdapter } from '@payloadcms/plugin-ecommerce/payments/stripe'
+import type { PaymentAdapter } from '@payloadcms/plugin-ecommerce/types'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { importExportPlugin } from '@payloadcms/plugin-import-export'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
-import { Plugin } from 'payload'
+import { APIError, Plugin } from 'payload'
 
 import { adminOnlyFieldAccess } from '@/access/adminOnlyFieldAccess'
 import { adminOrPublishedStatus } from '@/access/adminOrPublishedStatus'
+import { isB2BAccount, isCustomer } from '@/access/b2b'
 import { customerOnlyFieldAccess } from '@/access/customerOnlyFieldAccess'
 import { isAdmin } from '@/access/isAdmin'
 import { isDocumentOwner } from '@/access/isDocumentOwner'
+import { invoiceAdapter } from '@/b2b/payments/invoiceAdapter'
+import {
+  b2bCartsCollectionOverride,
+  b2bOrdersCollectionOverride,
+  b2bTransactionsCollectionOverride,
+  b2bVariantsCollectionOverride,
+} from '@/b2b/pluginOverrides'
 import { ProductsCollection } from '@/collections/Products'
-import { populateOrderProductNames } from '@/hooks/populateOrderProductNames'
 import { Page, Product } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 
@@ -55,6 +63,30 @@ const generateURL: GenerateURL<Product | Page> = ({ doc }) => {
   return doc?.slug ? `${url}/${doc.slug}` : url
 }
 
+const stripePaymentAdapter = stripeAdapter({
+  publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
+  secretKey: process.env.STRIPE_SECRET_KEY!,
+  // webhookSecret: process.env.STRIPE_WEBHOOKS_SIGNING_SECRET!,
+})
+
+const guardedStripeAdapter: PaymentAdapter = {
+  ...stripePaymentAdapter,
+  confirmOrder: async (args) => {
+    if (isB2BAccount(args.req.user)) {
+      throw new APIError('Business orders must be paid by invoice.', 403)
+    }
+
+    return stripePaymentAdapter.confirmOrder(args)
+  },
+  initiatePayment: async (args) => {
+    if (isB2BAccount(args.req.user)) {
+      throw new APIError('Business orders must be paid by invoice.', 403)
+    }
+
+    return stripePaymentAdapter.initiatePayment(args)
+  },
+}
+
 export const plugins: Plugin[] = [
   seoPlugin({
     generateTitle,
@@ -71,7 +103,7 @@ export const plugins: Plugin[] = [
         update: isAdmin,
       },
       admin: {
-        group: 'Content',
+        group: false,
       },
     },
     formOverrides: {
@@ -82,7 +114,7 @@ export const plugins: Plugin[] = [
         create: isAdmin,
       },
       admin: {
-        group: 'Content',
+        group: false,
       },
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
@@ -111,92 +143,30 @@ export const plugins: Plugin[] = [
       adminOrPublishedStatus,
       customerOnlyFieldAccess,
       isAdmin,
+      isCustomer,
       isDocumentOwner,
+    },
+    carts: {
+      cartsCollectionOverride: b2bCartsCollectionOverride,
+      
     },
     customers: {
       slug: 'users',
     },
     orders: {
-      ordersCollectionOverride: ({ defaultCollection }) => ({
-        ...defaultCollection,
-        fields: defaultCollection.fields.map((field) => {
-          if (field.type !== 'tabs') return field
-
-          return {
-            ...field,
-            tabs: field.tabs.map((tab) => ({
-              ...tab,
-              fields: tab.fields.map((tabField) => {
-                if ('name' in tabField && tabField.name === 'items' && tabField.type === 'array') {
-                  return {
-                    ...tabField,
-                    fields: [
-                      {
-                        name: 'product_name',
-                        type: 'text',
-                        label: 'Product Name',
-                        admin: {
-                          readOnly: true,
-                        },
-                      },
-                      ...tabField.fields,
-                    ],
-                  }
-                }
-
-                return tabField
-              }),
-            })),
-          }
-        }),
-        hooks: {
-          ...defaultCollection.hooks,
-          beforeChange: [
-            ...(defaultCollection.hooks?.beforeChange ?? []),
-            populateOrderProductNames,
-          ],
-        },
-      }),
+      ordersCollectionOverride: b2bOrdersCollectionOverride,
     },
     payments: {
-      paymentMethods: [
-        stripeAdapter({
-          secretKey: process.env.STRIPE_SECRET_KEY!,
-          publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
-          // webhookSecret: process.env.STRIPE_WEBHOOKS_SIGNING_SECRET!,
-        }),
-      ],
+      paymentMethods: [guardedStripeAdapter, invoiceAdapter()],
     },
-
     products: {
       productsCollectionOverride: ProductsCollection,
       variants: {
-        variantsCollectionOverride: ({ defaultCollection }) => ({
-          ...defaultCollection,
-          fields: [
-            ...defaultCollection.fields,
-            {
-              name: 'in_stock',
-              type: 'checkbox',
-              label: 'In Stock',
-              admin: {
-                width: '50%',
-                description: 'This field is only necessry for products of type "garden".',
-                // condition: (data, siblingData) => siblingData?.product?.product_type === 'garden',
-              },
-            },
-            {
-              name: 'total_plant_quantity',
-              type: 'number',
-              label: 'Total Plant Quantity',
-              admin: {
-                width: '50%',
-                description: 'This field is only necessry for products of type "garden".',
-              },
-            },
-          ],
-        }),
+        variantsCollectionOverride: b2bVariantsCollectionOverride,
       },
+    },
+    transactions: {
+      transactionsCollectionOverride: b2bTransactionsCollectionOverride,
     },
     currencies: {
       supportedCurrencies: [EUR],
@@ -298,6 +268,15 @@ export const plugins: Plugin[] = [
                   phone: shipping?.phone ? `${String(shipping.phone)}` : '',
 
                   status: String(order.status ?? ''),
+
+                  channel: String(order.channel ?? 'b2c'),
+                  b2bStatus: String(order.b2bStatus ?? ''),
+                  companyName: String(asRecord(order.companySnapshot)?.companyName ?? ''),
+                  vatId: String(asRecord(order.companySnapshot)?.vatId ?? ''),
+                  invoiceNumber: String(asRecord(order.invoice)?.invoiceNumber ?? ''),
+                  invoiceDueDate: formatOrderDate(asRecord(order.invoice)?.dueDate),
+                  invoicePaidAt: formatOrderDate(asRecord(order.invoice)?.paidAt),
+                  purchaseOrderNumber: String(order.purchaseOrderNumber ?? ''),
                 }
               })
             },

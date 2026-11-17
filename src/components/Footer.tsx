@@ -130,6 +130,14 @@ export const Footer: React.FC = () => {
                   label: locale === 'de' ? 'Pflanzanleitung' : 'Planting Guide',
                   href: `/${locale}/plant-guide`,
                 },
+                {
+                  label: locale === 'de' ? 'Geschäftskunden-Login' : 'Business Login',
+                  href: `/${locale}/business/login`,
+                },
+                {
+                  label: locale === 'de' ? 'Geschäftspartner werden' : 'Become a Partner',
+                  href: `/${locale}/business/apply`,
+                },
               ].map((link, i) => (
                 <li key={i}>
                   <a
@@ -283,7 +291,7 @@ export const Footer: React.FC = () => {
           >
             <span>{locale === 'de' ? 'Zurück nach oben' : 'Back to top'}</span>
             <div
-              className={`p-1.5 rounded-full border-2 border-stone-600 transition-all duration-300 group-hover:-translate-y-0.5  bg-white `}
+              className={`p-1.5 rounded-none border-2 border-stone-600 transition-all duration-300 group-hover:-translate-y-0.5  bg-white `}
             >
               <ArrowUp className="w-3.5 h-3.5" />
             </div>

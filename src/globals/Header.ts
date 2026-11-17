@@ -9,6 +9,9 @@ export const Header: GlobalConfig = {
     read: () => true,
     update: adminOnly,
   },
+  admin: {
+  group: false,
+},
   fields: [
     {
       name: 'navItems',

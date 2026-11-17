@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useAddresses } from '@payloadcms/plugin-ecommerce/client/react'
 import { AddressItem } from '@/components/addresses/AddressItem'
 
-export const AddressListing: React.FC<{ locale: string }> = ({ locale }) => {
+export const AddressListing: React.FC<{ locale: 'de' | 'en' }> = ({ locale }) => {
   const { addresses } = useAddresses()
 
   const [visibleAddresses, setVisibleAddresses] = useState(addresses ?? [])

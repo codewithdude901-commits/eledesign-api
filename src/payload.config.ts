@@ -17,10 +17,14 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import { plugins } from './plugins'
 
+import { AdminNotificationState } from '@/collections/AdminNotificationState'
+import { BusinessApplications } from '@/collections/BusinessApplications'
 import { Categories } from '@/collections/Categories'
+import { Counters } from '@/collections/Counters'
 import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { Users } from '@/collections/Users'
+import { B2BSettings } from '@/globals/B2BSettings'
 import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
 import { HomePage } from './globals/HomePage'
@@ -38,10 +42,21 @@ export default buildConfig({
       // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import `BeforeDashboard` statement on line 15.
       // beforeDashboard: ['@/components/BeforeDashboard#BeforeDashboard'],
+       afterNavLinks: [
+      '@/components/admin/NotificationBadges#NotificationBadges',
+    ],
     },
     user: Users.slug,
   },
-  collections: [Users, Pages, Categories, Media],
+  collections: [
+    Users,
+    Pages,
+    Categories,
+    Media,
+    BusinessApplications,
+    Counters,
+    AdminNotificationState,
+  ],
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || '',
   }),
@@ -100,7 +115,7 @@ export default buildConfig({
     apiKey: process.env.RESEND_API_KEY!,
   }),
   endpoints: [],
-  globals: [HomePage, Header, Footer],
+  globals: [HomePage, Header, Footer, B2BSettings],
   plugins,
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

@@ -42,6 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/users/create`, {
         body: JSON.stringify({
+          accountType: 'b2c',
           email: args.email,
           password: args.password,
           passwordConfirm: args.passwordConfirm,
@@ -72,6 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         body: JSON.stringify({
           email: args.email,
           password: args.password,
+          portal: 'b2c',
         }),
         credentials: 'include',
         headers: {

@@ -58,7 +58,7 @@ export function LocaleSwitcher() {
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="flex items-center gap-1.5  p-2.5 rounded-full text-black  hover:bg-black/5 transition-all duration-200 focus:outline-none  justify-center cursor-pointer"
+        className="flex items-center gap-1.5  p-2.5 rounded-none text-black  hover:bg-black/5 transition-all duration-200 focus:outline-none  justify-center cursor-pointer"
       >
         <Languages className="h-5 w-5" />
 

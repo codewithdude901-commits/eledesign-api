@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 import { GoogleTagManager } from '@/components/Analytics/GoogleTagManager'
 import { ConsentManager } from '@/components/Consent/ConsentManager'
-import { Footer } from '@/components/Footer'
+import { ConditionalFooter } from '@/components/Footer/ConditionalFooter'
 import { Navbar } from '@/components/Navbar'
 import { Providers } from '@/providers'
 import { GeistMono } from 'geist/font/mono'
@@ -26,7 +26,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <Providers>
           <Navbar />
           <main>{children}</main>
-          <Footer />
+          <ConditionalFooter />
         </Providers>
       </body>
     </html>

@@ -76,6 +76,9 @@ export interface Config {
     pages: Page;
     categories: Category;
     media: Media;
+    'business-applications': BusinessApplication;
+    counters: Counter;
+    'admin-notification-state': AdminNotificationState;
     forms: Form;
     'form-submissions': FormSubmission;
     addresses: Address;
@@ -112,6 +115,9 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'business-applications': BusinessApplicationsSelect<false> | BusinessApplicationsSelect<true>;
+    counters: CountersSelect<false> | CountersSelect<true>;
+    'admin-notification-state': AdminNotificationStateSelect<false> | AdminNotificationStateSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
@@ -138,11 +144,13 @@ export interface Config {
     'home-page': HomePage;
     header: Header;
     footer: Footer;
+    'b2b-settings': B2BSetting;
   };
   globalsSelect: {
     'home-page': HomePageSelect<false> | HomePageSelect<true>;
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'b2b-settings': B2BSettingsSelect<false> | B2BSettingsSelect<true>;
   };
   locale: 'de' | 'en';
   widgets: {
@@ -202,7 +210,23 @@ export interface UserAuthOperations {
 export interface User {
   id: string;
   name?: string | null;
-  roles?: ('admin' | 'customer')[] | null;
+  accountType?: ('b2c' | 'b2b') | null;
+  b2b?: {
+    companyName?: string | null;
+    vatId?: string | null;
+    contactPhone?: string | null;
+    invoiceEmail?: string | null;
+    website?: string | null;
+    preferredLocale?: ('de' | 'en') | null;
+    status?: ('pending' | 'approved' | 'suspended') | null;
+    /**
+     * Discount applied to B2B prices. 0 means the listed B2B price is used.
+     */
+    discountPercent?: number | null;
+    approvedAt?: string | null;
+    approvedBy?: (string | null) | User;
+  };
+  roles?: ('admin' | 'customer' | 'b2b')[] | null;
   orders?: {
     docs?: (string | Order)[];
     hasNextPage?: boolean;
@@ -245,10 +269,12 @@ export interface Order {
   id: string;
   items?:
     | {
-        product_name?: string | null;
         product?: (string | null) | Product;
         variant?: (string | null) | Variant;
         quantity: number;
+        product_name?: string | null;
+        unitPrice?: number | null;
+        lineTotal?: number | null;
         id?: string | null;
       }[]
     | null;
@@ -271,6 +297,52 @@ export interface Order {
   status?: OrderStatus;
   amount?: number | null;
   currency?: 'EUR' | null;
+  channel?: ('b2c' | 'b2b') | null;
+  /**
+   * Shown in the partner dashboard. The internal order status is synchronized for completed and cancelled orders.
+   */
+  b2bStatus?: ('awaiting_payment' | 'paid' | 'processing' | 'shipped' | 'completed' | 'cancelled') | null;
+  billingAddress?: {
+    title?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    company?: string | null;
+    addressLine1?: string | null;
+    addressLine2?: string | null;
+    city?: string | null;
+    state?: string | null;
+    postalCode?: string | null;
+    country?: string | null;
+    phone?: string | null;
+  };
+  companySnapshot?: {
+    companyName?: string | null;
+    vatId?: string | null;
+    contactName?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    preferredLocale?: ('de' | 'en') | null;
+  };
+  purchaseOrderNumber?: string | null;
+  customerNotes?: string | null;
+  invoice?: {
+    invoiceNumber?: string | null;
+    dueDate?: string | null;
+    netAmount?: number | null;
+    vatRate?: number | null;
+    vatAmount?: number | null;
+    grossAmount?: number | null;
+    bankAccountHolder?: string | null;
+    bankName?: string | null;
+    iban?: string | null;
+    bic?: string | null;
+    paymentReference?: string | null;
+    paidAt?: string | null;
+    paidBy?: (string | null) | User;
+    settlementNotes?: string | null;
+    footerText?: string | null;
+  };
+  inventoryRestored?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -391,6 +463,14 @@ export interface Product {
   };
   priceInEUREnabled?: boolean | null;
   priceInEUR?: number | null;
+  /**
+   * Net B2B price in cents, excl. VAT. Leave empty to make this product unavailable to B2B partners.
+   */
+  b2bPriceInEUR?: number | null;
+  /**
+   * Minimum quantity per order line for B2B partners.
+   */
+  b2bMinOrderQuantity?: number | null;
   sync_to_neighborbrite?: boolean | null;
   pot_size?: ('P 0,5 Bio' | 'P 0,5' | 'T 10' | 'T 14') | null;
   product_url?: string | null;
@@ -499,13 +579,21 @@ export interface Variant {
   priceInEUREnabled?: boolean | null;
   priceInEUR?: number | null;
   /**
-   * This field is only necessry for products of type "garden".
+   * This field is only necessary for products of type "garden".
    */
   in_stock?: boolean | null;
   /**
-   * This field is only necessry for products of type "garden".
+   * This field is only necessary for products of type "garden".
    */
   total_plant_quantity?: number | null;
+  /**
+   * Net B2B price in cents, excl. VAT. Overrides the product B2B price for this variant.
+   */
+  b2bPriceInEUR?: number | null;
+  /**
+   * Optional variant override. Leave empty to inherit the product-level B2B minimum order quantity.
+   */
+  b2bMinOrderQuantity?: number | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -537,13 +625,32 @@ export interface Transaction {
         product?: (string | null) | Product;
         variant?: (string | null) | Variant;
         quantity: number;
+        unitPrice?: number | null;
+        lineTotal?: number | null;
         id?: string | null;
       }[]
     | null;
-  paymentMethod?: 'stripe' | null;
+  paymentMethod?: ('stripe' | 'invoice') | null;
   stripe?: {
     customerID?: string | null;
     paymentIntentID?: string | null;
+  };
+  invoice?: {
+    invoiceNumber?: string | null;
+    dueDate?: string | null;
+    netAmount?: number | null;
+    vatRate?: number | null;
+    vatAmount?: number | null;
+    grossAmount?: number | null;
+    bankAccountHolder?: string | null;
+    bankName?: string | null;
+    iban?: string | null;
+    bic?: string | null;
+    paymentReference?: string | null;
+    purchaseOrderNumber?: string | null;
+    customerNotes?: string | null;
+    footerText?: string | null;
+    paidAt?: string | null;
   };
   billingAddress?: {
     title?: string | null;
@@ -565,6 +672,19 @@ export interface Transaction {
   cart?: (string | null) | Cart;
   amount?: number | null;
   currency?: 'EUR' | null;
+  shippingAddress?: {
+    title?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    company?: string | null;
+    addressLine1?: string | null;
+    addressLine2?: string | null;
+    city?: string | null;
+    state?: string | null;
+    postalCode?: string | null;
+    country?: string | null;
+    phone?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -579,6 +699,9 @@ export interface Cart {
         product?: (string | null) | Product;
         variant?: (string | null) | Variant;
         quantity: number;
+        unitPrice?: number | null;
+        lineTotal?: number | null;
+        b2bIssue?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -588,6 +711,7 @@ export interface Cart {
   status?: ('active' | 'purchased' | 'abandoned') | null;
   subtotal?: number | null;
   currency?: 'EUR' | null;
+  channel?: ('b2c' | 'b2b') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1117,6 +1241,57 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "business-applications".
+ */
+export interface BusinessApplication {
+  id: string;
+  companyName: string;
+  contactName: string;
+  email: string;
+  phone?: string | null;
+  vatId?: string | null;
+  website?: string | null;
+  address?: {
+    street?: string | null;
+    postalCode?: string | null;
+    city?: string | null;
+    country?: string | null;
+  };
+  message?: string | null;
+  termsAccepted: boolean;
+  status?: ('pending' | 'approved' | 'rejected') | null;
+  reviewNotes?: string | null;
+  reviewedAt?: string | null;
+  reviewedBy?: (string | null) | User;
+  user?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "counters".
+ */
+export interface Counter {
+  id: string;
+  key: string;
+  value: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "admin-notification-state".
+ */
+export interface AdminNotificationState {
+  id: string;
+  key: string;
+  ordersLastSeenAt?: string | null;
+  applicationsLastSeenAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
@@ -1340,6 +1515,18 @@ export interface PayloadLockedDocument {
         value: string | Media;
       } | null)
     | ({
+        relationTo: 'business-applications';
+        value: string | BusinessApplication;
+      } | null)
+    | ({
+        relationTo: 'counters';
+        value: string | Counter;
+      } | null)
+    | ({
+        relationTo: 'admin-notification-state';
+        value: string | AdminNotificationState;
+      } | null)
+    | ({
         relationTo: 'forms';
         value: string | Form;
       } | null)
@@ -1427,6 +1614,21 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  accountType?: T;
+  b2b?:
+    | T
+    | {
+        companyName?: T;
+        vatId?: T;
+        contactPhone?: T;
+        invoiceEmail?: T;
+        website?: T;
+        preferredLocale?: T;
+        status?: T;
+        discountPercent?: T;
+        approvedAt?: T;
+        approvedBy?: T;
+      };
   roles?: T;
   orders?: T;
   cart?: T;
@@ -1652,6 +1854,56 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "business-applications_select".
+ */
+export interface BusinessApplicationsSelect<T extends boolean = true> {
+  companyName?: T;
+  contactName?: T;
+  email?: T;
+  phone?: T;
+  vatId?: T;
+  website?: T;
+  address?:
+    | T
+    | {
+        street?: T;
+        postalCode?: T;
+        city?: T;
+        country?: T;
+      };
+  message?: T;
+  termsAccepted?: T;
+  status?: T;
+  reviewNotes?: T;
+  reviewedAt?: T;
+  reviewedBy?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "counters_select".
+ */
+export interface CountersSelect<T extends boolean = true> {
+  key?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "admin-notification-state_select".
+ */
+export interface AdminNotificationStateSelect<T extends boolean = true> {
+  key?: T;
+  ordersLastSeenAt?: T;
+  applicationsLastSeenAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "forms_select".
  */
 export interface FormsSelect<T extends boolean = true> {
@@ -1832,6 +2084,8 @@ export interface VariantsSelect<T extends boolean = true> {
   priceInEUR?: T;
   in_stock?: T;
   total_plant_quantity?: T;
+  b2bPriceInEUR?: T;
+  b2bMinOrderQuantity?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1923,6 +2177,8 @@ export interface ProductsSelect<T extends boolean = true> {
   variants?: T;
   priceInEUREnabled?: T;
   priceInEUR?: T;
+  b2bPriceInEUR?: T;
+  b2bMinOrderQuantity?: T;
   sync_to_neighborbrite?: T;
   pot_size?: T;
   product_url?: T;
@@ -1954,6 +2210,9 @@ export interface CartsSelect<T extends boolean = true> {
         product?: T;
         variant?: T;
         quantity?: T;
+        unitPrice?: T;
+        lineTotal?: T;
+        b2bIssue?: T;
         id?: T;
       };
   secret?: T;
@@ -1962,6 +2221,7 @@ export interface CartsSelect<T extends boolean = true> {
   status?: T;
   subtotal?: T;
   currency?: T;
+  channel?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1973,10 +2233,12 @@ export interface OrdersSelect<T extends boolean = true> {
   items?:
     | T
     | {
-        product_name?: T;
         product?: T;
         variant?: T;
         quantity?: T;
+        product_name?: T;
+        unitPrice?: T;
+        lineTotal?: T;
         id?: T;
       };
   shippingAddress?:
@@ -2000,6 +2262,55 @@ export interface OrdersSelect<T extends boolean = true> {
   status?: T;
   amount?: T;
   currency?: T;
+  channel?: T;
+  b2bStatus?: T;
+  billingAddress?:
+    | T
+    | {
+        title?: T;
+        firstName?: T;
+        lastName?: T;
+        company?: T;
+        addressLine1?: T;
+        addressLine2?: T;
+        city?: T;
+        state?: T;
+        postalCode?: T;
+        country?: T;
+        phone?: T;
+      };
+  companySnapshot?:
+    | T
+    | {
+        companyName?: T;
+        vatId?: T;
+        contactName?: T;
+        email?: T;
+        phone?: T;
+        preferredLocale?: T;
+      };
+  purchaseOrderNumber?: T;
+  customerNotes?: T;
+  invoice?:
+    | T
+    | {
+        invoiceNumber?: T;
+        dueDate?: T;
+        netAmount?: T;
+        vatRate?: T;
+        vatAmount?: T;
+        grossAmount?: T;
+        bankAccountHolder?: T;
+        bankName?: T;
+        iban?: T;
+        bic?: T;
+        paymentReference?: T;
+        paidAt?: T;
+        paidBy?: T;
+        settlementNotes?: T;
+        footerText?: T;
+      };
+  inventoryRestored?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2014,6 +2325,8 @@ export interface TransactionsSelect<T extends boolean = true> {
         product?: T;
         variant?: T;
         quantity?: T;
+        unitPrice?: T;
+        lineTotal?: T;
         id?: T;
       };
   paymentMethod?: T;
@@ -2022,6 +2335,25 @@ export interface TransactionsSelect<T extends boolean = true> {
     | {
         customerID?: T;
         paymentIntentID?: T;
+      };
+  invoice?:
+    | T
+    | {
+        invoiceNumber?: T;
+        dueDate?: T;
+        netAmount?: T;
+        vatRate?: T;
+        vatAmount?: T;
+        grossAmount?: T;
+        bankAccountHolder?: T;
+        bankName?: T;
+        iban?: T;
+        bic?: T;
+        paymentReference?: T;
+        purchaseOrderNumber?: T;
+        customerNotes?: T;
+        footerText?: T;
+        paidAt?: T;
       };
   billingAddress?:
     | T
@@ -2045,6 +2377,21 @@ export interface TransactionsSelect<T extends boolean = true> {
   cart?: T;
   amount?: T;
   currency?: T;
+  shippingAddress?:
+    | T
+    | {
+        title?: T;
+        firstName?: T;
+        lastName?: T;
+        company?: T;
+        addressLine1?: T;
+        addressLine2?: T;
+        city?: T;
+        state?: T;
+        postalCode?: T;
+        country?: T;
+        phone?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2303,6 +2650,35 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "b2b-settings".
+ */
+export interface B2BSetting {
+  id: string;
+  bankAccountHolder?: string | null;
+  bankName?: string | null;
+  iban?: string | null;
+  bic?: string | null;
+  invoiceDueDays: number;
+  vatRatePercent: number;
+  invoiceNumberPrefix: string;
+  /**
+   * Minimum B2B net order value in cents. Set to 0 to disable.
+   */
+  minimumOrderValue?: number | null;
+  /**
+   * Receives a notification when a business partner places an order.
+   */
+  orderNotificationEmail?: string | null;
+  invoiceFooterText?: string | null;
+  /**
+   * Link to the business partner terms shown during checkout.
+   */
+  termsUrl?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home-page_select".
  */
 export interface HomePageSelect<T extends boolean = true> {
@@ -2426,6 +2802,26 @@ export interface FooterSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "b2b-settings_select".
+ */
+export interface B2BSettingsSelect<T extends boolean = true> {
+  bankAccountHolder?: T;
+  bankName?: T;
+  iban?: T;
+  bic?: T;
+  invoiceDueDays?: T;
+  vatRatePercent?: T;
+  invoiceNumberPrefix?: T;
+  minimumOrderValue?: T;
+  orderNotificationEmail?: T;
+  invoiceFooterText?: T;
+  termsUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -2448,6 +2844,9 @@ export interface TaskCreateCollectionExport {
       | 'pages'
       | 'categories'
       | 'media'
+      | 'business-applications'
+      | 'counters'
+      | 'admin-notification-state'
       | 'forms'
       | 'form-submissions'
       | 'addresses'

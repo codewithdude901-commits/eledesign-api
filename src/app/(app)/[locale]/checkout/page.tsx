@@ -1,11 +1,30 @@
+import configPromise from '@payload-config'
 import type { Metadata } from 'next'
-
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
+import { headers as getHeaders } from 'next/headers'
+import { getPayload } from 'payload'
+import { redirect } from 'next/navigation'
 import React, { Fragment } from 'react'
 
 import { CheckoutPage } from '@/components/checkout/CheckoutPage'
+import type { User } from '@/payload-types'
+import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
-export default function Checkout() {
+type Props = {
+  params: Promise<{
+    locale: 'de' | 'en'
+  }>
+}
+
+export default async function Checkout({ params }: Props) {
+  const { locale } = await params
+  const headers = await getHeaders()
+  const payload = await getPayload({ config: configPromise })
+  const { user } = await payload.auth({ headers })
+
+  if ((user as User | null)?.accountType === 'b2b') {
+    redirect(`/${locale}/business/checkout`)
+  }
+
   return (
     <div className="container min-h-[90vh] flex">
       {!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (

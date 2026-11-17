@@ -1,3 +1,5 @@
+import { adminOnlyFieldAccess } from '@/access/adminOnlyFieldAccess'
+import { adminOrApprovedB2BFieldAccess } from '@/access/b2b'
 import { generatePreviewPath } from '@/utilities/generatePreviewPath'
 import { CollectionOverride } from '@payloadcms/plugin-ecommerce/types'
 import {
@@ -13,7 +15,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
   ...defaultCollection,
   admin: {
     ...defaultCollection?.admin,
-    defaultColumns: ['title', 'botanical_name', '_status'],
+    defaultColumns: ['title', 'botanical_name', 'b2bPriceInEUR', '_status'],
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({
@@ -40,7 +42,10 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     meta: true,
     description: true,
     maintenance_level_garden_set: true,
+    style_tags: true,
     priceInEUR: true,
+    b2bPriceInEUR: true,
+    b2bMinOrderQuantity: true,
     common_name: true,
     botanical_name_full: true,
     variants: true,
@@ -493,6 +498,37 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
           label: 'E-Commerce Details',
           fields: [
             ...defaultCollection.fields,
+            {
+              name: 'b2bPriceInEUR',
+              type: 'number',
+              min: 0,
+              access: {
+                create: adminOnlyFieldAccess,
+                read: adminOrApprovedB2BFieldAccess,
+                update: adminOnlyFieldAccess,
+              },
+              admin: {
+                description:
+                  'Net B2B price in cents, excl. VAT. Leave empty to make this product unavailable to B2B partners.',
+                step: 1,
+              },
+              label: 'B2B Price (EUR, net)',
+            },
+            {
+              name: 'b2bMinOrderQuantity',
+              type: 'number',
+              defaultValue: 1,
+              min: 1,
+              access: {
+                create: adminOnlyFieldAccess,
+                read: () => true,
+                update: adminOnlyFieldAccess,
+              },
+              admin: {
+                description: 'Minimum quantity per order line for B2B partners.',
+              },
+              label: 'B2B Minimum Order Quantity',
+            },
             {
               name: 'sync_to_neighborbrite',
               type: 'checkbox',

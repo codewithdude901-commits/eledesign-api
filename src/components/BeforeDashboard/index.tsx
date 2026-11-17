@@ -1,84 +1,74 @@
-import { Banner } from '@payloadcms/ui'
 import React from 'react'
 
-import { SeedButton } from './SeedButton'
-import './index.scss'
+type Props = {
+  user?: {
+    id?: string | number
+    email?: string | null
+  } | null
+}
 
-const baseClass = 'before-dashboard'
+const navLinks = [
+  {
+    href: '/admin/collections/business-applications',
+    label: 'Business applications',
+    description: 'Review and approve partner applications',
+  },
+  {
+    href: '/admin/collections/users',
+    label: 'Users',
+    description: 'Manage accounts and B2B details',
+  },
+  {
+    href: '/admin/collections/orders',
+    label: 'Orders',
+    description: 'B2B orders and invoice settlement',
+  },
+  {
+    href: '/admin/globals/b2b-settings',
+    label: 'B2B settings',
+    description: 'Bank details, VAT rate, invoice terms',
+  },
+]
 
-export const BeforeDashboard: React.FC = () => {
+export const BeforeDashboard: React.FC<Props> = ({ user }) => {
+  const email = user?.email
+
   return (
-    <div className={baseClass}>
-      <Banner className={`${baseClass}__banner`} type="success">
-        <h4>Welcome to your dashboard!</h4>
-      </Banner>
-      Here&apos;s what to do next:
-      <ul className={`${baseClass}__instructions`}>
-        <li>
-          <SeedButton />
-          {' with a few products and pages to jump-start your new project, then '}
-          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-          <a href="/">visit your website</a>
-          {' to see the results.'}
-        </li>
-        <li>
-          {'Head over to '}
+    <div style={{ padding: '2rem', maxWidth: 1200, margin: '0 auto', fontFamily: 'system-ui, sans-serif' }}>
+      <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>B2B admin</h2>
+      <p style={{ color: '#666', marginBottom: '2rem' }}>
+        {email ? `Signed in as ${email}.` : 'Signed in.'}
+      </p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        {navLinks.map((link) => (
           <a
-            href="https://dashboard.stripe.com/test/apikeys"
-            rel="noopener noreferrer"
-            target="_blank"
+            key={link.href}
+            href={link.href}
+            style={{
+              display: 'block',
+              padding: '1rem',
+              border: '1px solid #e2e8f0',
+              borderRadius: 0,
+              background: '#fff',
+              color: '#1a1a1a',
+              textDecoration: 'none',
+              transition: 'background-color 0.2s',
+            }}
           >
-            Stripe to obtain your API Keys
+            <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>{link.label}</h3>
+            <p style={{ margin: '0.25rem 0 0', fontSize: '0.8rem', color: '#666' }}>{link.description}</p>
           </a>
-          {
-            '. Create a new account if needed, then copy them into your environment variables and restart your server. See the '
-          }
-          <a
-            href="https://github.com/payloadcms/payload/blob/3.x/templates/ecommerce/README.md#stripe"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            README
-          </a>
-          {' for more details.'}
-        </li>
-        <li>
-          {'Modify your '}
-          <a
-            href="https://payloadcms.com/docs/configuration/collections"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            collections
-          </a>
-          {' and add more '}
-          <a
-            href="https://payloadcms.com/docs/fields/overview"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            fields
-          </a>
-          {' as needed. If you are new to Payload, we also recommend you check out the '}
-          <a
-            href="https://payloadcms.com/docs/getting-started/what-is-payload"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Getting Started
-          </a>
-          {' docs.'}
-        </li>
-      </ul>
-      {'Pro Tip: This block is a '}
-      <a
-        href="https://payloadcms.com/docs/admin/components#base-component-overrides"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        custom component
-      </a>
-      , you can remove it at any time by updating your <strong>payload.config</strong>.
+        ))}
+      </div>
+
+      <div style={{ padding: '1rem', border: '1px solid #e2e8f0', background: '#fff' }}>
+        <h3 style={{ fontSize: '0.9rem', fontWeight: 600, margin: '0 0 0.5rem 0' }}>Collections and globals</h3>
+        <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>
+          Pages, Categories, Media, Forms, Form Submissions, Home Page, Header and Footer remain
+          available in the left-hand navigation.
+        </p>
+      </div>
     </div>
   )
 }

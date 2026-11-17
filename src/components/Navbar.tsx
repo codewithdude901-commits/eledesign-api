@@ -1,9 +1,10 @@
 'use client'
 
-import { User } from 'lucide-react'
+import { ShoppingBag, User } from 'lucide-react'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
 import React, { Suspense } from 'react'
+import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import { Cart } from './Cart'
 import { OpenCartButton } from './Cart/OpenCart'
 import { MobileMenu } from './MobileMenu'
@@ -12,10 +13,13 @@ import { LocaleSwitcher } from '@/components/LocaleSwitcher'
 
 export const Navbar: React.FC = () => {
   const pathname = usePathname()
+  const { cart } = useCart()
 
   const params = useParams<{ locale: 'de' | 'en' }>()
 
   const locale = params.locale
+  const isBusiness = pathname.includes('/business')
+  const businessCartCount = (cart as unknown as { items?: unknown[] } | null)?.items?.length || 0
 
   // const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   // const [isProfileOpen, setIsProfileOpen] = useState(false)
@@ -43,11 +47,13 @@ export const Navbar: React.FC = () => {
       <header className="sticky top-0 z-40 w-full glass-nav shadow-sm bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[8vh] flex items-center justify-between">
           {/* Left: Logo */}
-          <div className="block flex-none md:hidden">
-            <Suspense fallback={null}>
-              <MobileMenu menu={navLinks} locale={locale} />
-            </Suspense>
-          </div>
+          {!isBusiness && (
+            <div className="block flex-none md:hidden">
+              <Suspense fallback={null}>
+                <MobileMenu menu={navLinks} locale={locale} />
+              </Suspense>
+            </div>
+          )}
           <div className="flex items-center overflow-hidden h-full">
             <Link
               href={`/${locale}`}
@@ -58,7 +64,7 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Center: Links (Desktop) */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className={isBusiness ? 'hidden' : 'hidden md:flex items-center space-x-6'}>
             {navLinks.map((link) => {
               const isActive = pathname === link.href
 
@@ -88,16 +94,31 @@ export const Navbar: React.FC = () => {
               <LocaleSwitcher />
             </Suspense>
             <Link
-              href={`/${locale}/account`}
-              className="p-2.5 rounded-full text-black  hover:bg-black/5 transition-all duration-200 focus:outline-none  items-center justify-center hidden md:flex"
+              href={isBusiness ? `/${locale}/business/dashboard` : `/${locale}/account`}
+              className="p-2.5 rounded-none text-black  hover:bg-black/5 transition-all duration-200 focus:outline-none  items-center justify-center hidden md:flex"
             >
               <User className="w-5.5 h-5.5" />
             </Link>
 
             {/* Shopping Cart Button */}
-            <Suspense fallback={<OpenCartButton />}>
-              <Cart locale={locale} />
-            </Suspense>
+            {isBusiness ? (
+              <Link
+                className="relative flex items-center gap-2 rounded-none px-3 py-2 text-sm font-medium hover:bg-black/5"
+                href={`/${locale}/business/cart`}
+              >
+                <ShoppingBag className="h-5 w-5" />
+                <span className="hidden sm:inline">B2B</span>
+                {businessCartCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-none bg-emerald-700 px-1 text-[10px] font-semibold text-white">
+                    {businessCartCount}
+                  </span>
+                )}
+              </Link>
+            ) : (
+              <Suspense fallback={<OpenCartButton />}>
+                <Cart locale={locale} />
+              </Suspense>
+            )}
           </div>
         </div>
       </header>

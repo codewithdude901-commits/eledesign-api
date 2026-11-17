@@ -106,10 +106,13 @@ export function VariantSelector({ product }: { product: Product }) {
                   className="rounded-none"
                   disabled={!isAvailableForSale}
                   key={option.id}
+                  // onClick={() => {
+                  //   router.replace(`${optionUrl}`, {
+                  //     scroll: false,
+                  //   })
+                  // }}
                   onClick={() => {
-                    router.replace(`${optionUrl}`, {
-                      scroll: false,
-                    })
+                    window.history.replaceState(null, '', optionUrl)
                   }}
 
                   title={`${option.label} ${!isAvailableForSale ? ' (Out of Stock)' : ''}`}

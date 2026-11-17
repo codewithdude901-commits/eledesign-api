@@ -3,7 +3,6 @@ import type { CollectionBeforeChangeHook } from 'payload'
 export const populateOrderProductNames: CollectionBeforeChangeHook = async ({
   data,
   req,
-  operation,
 }) => {
   if (!Array.isArray(data.items)) return data
 
@@ -27,9 +26,6 @@ export const populateOrderProductNames: CollectionBeforeChangeHook = async ({
           overrideAccess: true,
         })
       }
-
-      console.log('Order operation:', operation)
-      console.log('Resolved product:', product)
 
       return {
         ...item,

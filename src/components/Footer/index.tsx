@@ -1,5 +1,6 @@
 import type { Footer } from '@/payload-types'
 
+import { BusinessFooterLink } from '@/components/business/BusinessFooterLink'
 import { FooterMenu } from '@/components/Footer/menu'
 import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { getCachedGlobal } from '@/utilities/getGlobals'
@@ -43,6 +44,7 @@ export async function Footer() {
             <FooterMenu menu={menu} />
           </Suspense>
           <div className="md:ml-auto flex flex-col gap-4 items-end">
+            <BusinessFooterLink />
             <ThemeSelector />
           </div>
         </div>

@@ -38,10 +38,15 @@ export const approveApplication: CollectionBeforeChangeHook = async ({
   const incoming = data as Partial<Application>
   const previous = originalDoc as Application | undefined
 
+  const emailChanged =
+    typeof incoming.email === 'string' &&
+    incoming.email.toLowerCase().trim() !==
+      (previous?.email || '').toLowerCase().trim()
+
   if (
     operation !== 'update' ||
     incoming.status !== 'approved' ||
-    previous?.status === 'approved'
+    (previous?.status === 'approved' && !emailChanged)
   ) {
     return data
   }
@@ -51,7 +56,7 @@ export const approveApplication: CollectionBeforeChangeHook = async ({
     ...incoming,
   } as Application
 
-  if (application.user) {
+  if (application.user && !emailChanged) {
     return data
   }
 
@@ -89,6 +94,13 @@ export const approveApplication: CollectionBeforeChangeHook = async ({
     )
   }
 
+  if (emailChanged && existingUser && String(existingUser.id) !== String(application.user)) {
+    throw new APIError(
+      'A user with this email already exists. Review this application manually.',
+      400,
+    )
+  }
+
   const b2bData = {
     approvedAt: new Date().toISOString(),
     approvedBy: req.user?.id,
@@ -112,7 +124,32 @@ export const approveApplication: CollectionBeforeChangeHook = async ({
   req.context.b2bApproval = true
 
   try {
-    if (existingUser) {
+    if (application.user && emailChanged) {
+      const linkedUser = (await payload.findByID({
+        collection: 'users',
+        depth: 0,
+        id: application.user as string | number,
+        overrideAccess: true,
+        req,
+      })) as unknown as { b2b?: Record<string, unknown> | null } | undefined
+
+      const updatedUser = (await payload.update({
+        collection: 'users',
+        data: {
+          b2b: {
+            ...(linkedUser?.b2b || {}),
+            invoiceEmail: email,
+          },
+          email,
+          name: application.contactName,
+        },
+        id: application.user as string | number,
+        overrideAccess: true,
+        req,
+      })) as unknown as { id: string }
+
+      userID = updatedUser.id
+    } else if (existingUser) {
       const updatedUser = (await payload.update({
         collection: 'users',
         data: {

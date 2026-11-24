@@ -332,15 +332,16 @@ export const CheckoutPage: React.FC = () => {
               </div>
             ) : user ? (
               <CheckoutAddresses
-                locale={locale}
-
-                heading={t.shippingAddress}
+                addressType="shipping"
                 description={t.shippingAddressDescription}
+                heading={t.shippingAddress}
+                locale={locale}
                 setAddress={setShippingAddress}
               />
             ) : (
               <CreateAddressModal
                 locale={locale}
+                addressType="shipping"
                 callback={(address) => {
                   setShippingAddress(address)
                 }}

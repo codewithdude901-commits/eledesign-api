@@ -1,5 +1,5 @@
-import type { Field } from 'payload'
 import type { CollectionOverride } from '@payloadcms/plugin-ecommerce/types'
+import type { Field } from 'payload'
 
 import { adminOnlyFieldAccess } from '@/access/adminOnlyFieldAccess'
 import { adminOrApprovedB2BFieldAccess } from '@/access/b2b'
@@ -9,9 +9,10 @@ import {
   orderItemPriceFields,
   transactionItemPriceFields,
 } from '@/b2b/collections/fieldHelpers'
-import { setB2BCartPricing } from '@/b2b/hooks/setB2BCartPricing'
 import { setB2BOrderStatus, syncB2BOrderAfterChange } from '@/b2b/hooks/orderHooks'
+import { setB2BCartPricing } from '@/b2b/hooks/setB2BCartPricing'
 import { populateOrderProductNames } from '@/hooks/populateOrderProductNames'
+import { sendB2COrderConfirmationAfterChange } from '@/b2c/hooks/orderHooks'
 
 const productNameField: Field = {
   name: 'product_name',
@@ -154,6 +155,12 @@ export const b2bCartsCollectionOverride: CollectionOverride = ({ defaultCollecti
 })
 
 export const b2bOrdersCollectionOverride: CollectionOverride = ({ defaultCollection }) => {
+  // console.log(
+  //   '[Orders Default Fields]',
+  //   defaultCollection.fields
+  //     .filter((field) => 'name' in field)
+  //     .map((field) => field.name),
+  // )
   const baseFields = defaultCollection.fields.map((field) => {
     if (field.type === 'select' && field.name === 'status') {
       return {
@@ -282,10 +289,31 @@ export const b2bOrdersCollectionOverride: CollectionOverride = ({ defaultCollect
           readOnly: true,
         },
       },
+      {
+        name: 'accessToken',
+        type: 'text',
+        unique: true,
+        index: true,
+        admin: {
+          position: 'sidebar',
+          readOnly: true,
+        },
+        hooks: {
+          beforeValidate: [
+            ({ value, operation }) => {
+              if (operation === 'create' || !value) {
+                return crypto.randomUUID()
+              }
+
+              return value
+            },
+          ],
+        },
+      },
     ],
     hooks: {
       ...defaultCollection.hooks,
-      afterChange: [syncB2BOrderAfterChange],
+      afterChange: [syncB2BOrderAfterChange, sendB2COrderConfirmationAfterChange],
       beforeChange: [
         ...(defaultCollection.hooks?.beforeChange || []),
         populateOrderProductNames,

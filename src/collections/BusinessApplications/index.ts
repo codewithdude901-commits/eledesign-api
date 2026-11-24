@@ -78,11 +78,17 @@ export const BusinessApplications: CollectionConfig = {
     {
       name: 'message',
       type: 'textarea',
+      access: {
+        update: adminOnlyFieldAccess,
+      },
     },
     {
       name: 'termsAccepted',
       type: 'checkbox',
       required: true,
+      access: {
+        update: adminOnlyFieldAccess,
+      },
       validate: (value) =>
         value === true || 'You must accept the business partner terms to apply.',
     },
@@ -135,6 +141,9 @@ export const BusinessApplications: CollectionConfig = {
         create: adminOnlyFieldAccess,
         read: adminOnlyFieldAccess,
         update: adminOnlyFieldAccess,
+      },
+      filterOptions: {
+        roles: { equals: 'admin' },
       },
     },
     {

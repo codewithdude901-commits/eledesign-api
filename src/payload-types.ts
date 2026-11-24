@@ -343,6 +343,7 @@ export interface Order {
     footerText?: string | null;
   };
   inventoryRestored?: boolean | null;
+  accessToken?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2311,6 +2312,7 @@ export interface OrdersSelect<T extends boolean = true> {
         footerText?: T;
       };
   inventoryRestored?: T;
+  accessToken?: T;
   updatedAt?: T;
   createdAt?: T;
 }

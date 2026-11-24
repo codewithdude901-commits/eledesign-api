@@ -18,6 +18,7 @@ type Props = {
   initialData?: Partial<Omit<Address, 'country'>> & { country?: string }
   buttonText?: string
   modalTitle?: string
+  addressType?: 'billing' | 'shipping'
   callback?: (address: Partial<Address>) => void
   skipSubmission?: boolean
   disabled?: boolean
@@ -28,12 +29,28 @@ export const CreateAddressModal: React.FC<Props> = ({
   addressID,
   initialData,
   locale,
-  buttonText = locale === 'de' ? 'Eine neue Adresse hinzufügen' : 'Add a new address',
-  modalTitle = locale === 'de' ? 'Eine neue Adresse hinzufügen' : 'Add a new address',
+  buttonText,
+  modalTitle,
   callback,
   skipSubmission,
   disabled,
+  addressType,
 }) => {
+  const resolvedButtonText =
+    buttonText ??
+    (addressType === 'billing'
+      ? locale === 'de'
+        ? 'Eine neue Rechnungsadresse hinzufügen'
+        : 'Add a new billing address'
+      : addressType === 'shipping'
+        ? locale === 'de'
+          ? 'Eine neue Lieferadresse hinzufügen'
+          : 'Add a new shipping address'
+        : locale === 'de'
+          ? 'Eine neue Adresse hinzufügen'
+          : 'Add a new address')
+
+  const resolvedModalTitle = modalTitle ?? resolvedButtonText
   const [open, setOpen] = useState(false)
   const handleOpenChange = (state: boolean) => {
     setOpen(state)
@@ -54,11 +71,11 @@ export const CreateAddressModal: React.FC<Props> = ({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild disabled={disabled}>
-        <Button variant={'outline'} className='rounded-none'>{buttonText}</Button>
+        <Button variant={'outline'} className='rounded-none'>{resolvedButtonText}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{modalTitle}</DialogTitle>
+          <DialogTitle>{resolvedModalTitle}</DialogTitle>
           <DialogDescription className='text-stone-800'>
             {locale === 'de' ? 'Diese Adresse wird mit Ihrem Konto verknüpft.' : 'This address will be connected to your account.'}
           </DialogDescription>

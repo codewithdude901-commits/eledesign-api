@@ -202,6 +202,7 @@ export const BusinessCheckout: React.FC<Props> = ({ locale, termsUrl, vatRatePer
             />
           ) : (
             <CheckoutAddresses
+              addressType="billing"
               heading={locale === 'de' ? 'Rechnungsadresse' : 'Billing address'}
               locale={locale}
               selectedAddress={billingAddress as Address | undefined}
@@ -228,6 +229,7 @@ export const BusinessCheckout: React.FC<Props> = ({ locale, termsUrl, vatRatePer
             />
           ) : (
             <CheckoutAddresses
+              addressType="shipping"
               heading={locale === 'de' ? 'Lieferadresse' : 'Shipping address'}
               locale={locale}
               selectedAddress={shippingAddress as Address | undefined}

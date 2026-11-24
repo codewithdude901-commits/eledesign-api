@@ -14,15 +14,21 @@ export const sendApprovalEmail: CollectionAfterChangeHook = async ({
   req,
 }) => {
   const application = doc as unknown as {
+    email?: null | string
     id: number | string
     status?: null | string
     user?: unknown
   }
-  const previous = previousDoc as unknown as { status?: null | string } | undefined
+  const previous = previousDoc as unknown as { email?: null | string; status?: null | string } | undefined
+
+  const emailChanged =
+    typeof application.email === 'string' &&
+    application.email.toLowerCase().trim() !==
+      (previous?.email || '').toLowerCase().trim()
 
   if (
     application.status !== 'approved' ||
-    previous?.status === 'approved' ||
+    (previous?.status === 'approved' && !emailChanged) ||
     !application.user
   ) {
     return doc

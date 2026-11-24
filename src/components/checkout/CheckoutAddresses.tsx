@@ -21,6 +21,9 @@ type Props = {
   description?: string
   setSubmit?: React.Dispatch<React.SetStateAction<() => void | Promise<void>>>
   locale: 'de' | 'en'
+  addressType?: 'billing' | 'shipping'
+  buttonText?: string
+  modalTitle?: string
 }
 
 export const CheckoutAddresses: React.FC<Props> = ({
@@ -28,19 +31,36 @@ export const CheckoutAddresses: React.FC<Props> = ({
   heading = 'Addresses',
   description = 'Please select or add your shipping and billing addresses.',
   locale,
+  addressType,
 }) => {
   const { addresses } = useAddresses()
+
+  const buttonText =
+    addressType === 'billing'
+      ? locale === 'de'
+        ? 'Eine neue Rechnungsadresse hinzufügen'
+        : 'Add a new billing address'
+      : addressType === 'shipping'
+        ? locale === 'de'
+          ? 'Eine neue Lieferadresse hinzufügen'
+          : 'Add a new shipping address'
+        : locale === 'de'
+          ? 'Eine neue Adresse hinzufügen'
+          : 'Add a new address'
+
+  const modalTitle = buttonText
 
   if (!addresses || addresses.length === 0) {
     return (
       <div>
+        {heading ? <h3 className="text-xl font-medium mb-2">{heading}</h3> : null}
         <p>
           {locale === 'de'
             ? 'Keine Adressen gefunden. Bitte fügen Sie eine Adresse hinzu.'
             : 'No addresses found. Please add an address.'}
         </p>
 
-        <CreateAddressModal locale={locale} />
+        <CreateAddressModal locale={locale} buttonText={buttonText} modalTitle={modalTitle} />
       </div>
     )
   }
@@ -55,12 +75,12 @@ export const CheckoutAddresses: React.FC<Props> = ({
             : 'Please select or add your shipping and billing addresses.'}
         </p>
       </div>
-      <AddressesModal setAddress={setAddress} locale={locale} />
+      <AddressesModal setAddress={setAddress} locale={locale} buttonText={buttonText} modalTitle={modalTitle} />
     </div>
   )
 }
 
-const AddressesModal: React.FC<Props> = ({ setAddress, locale }) => {
+const AddressesModal: React.FC<Props> = ({ setAddress, locale, buttonText, modalTitle }) => {
   const [open, setOpen] = useState(false)
   const handleOpenChange = (state: boolean) => {
     setOpen(state)
@@ -119,7 +139,7 @@ const AddressesModal: React.FC<Props> = ({ setAddress, locale }) => {
             ))}
           </ul>
 
-          <CreateAddressModal locale={locale} />
+          <CreateAddressModal locale={locale} buttonText={buttonText} modalTitle={modalTitle} />
         </div>
       </DialogContent>
     </Dialog>

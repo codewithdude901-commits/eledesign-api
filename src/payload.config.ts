@@ -44,6 +44,7 @@ export default buildConfig({
       // beforeDashboard: ['@/components/BeforeDashboard#BeforeDashboard'],
        afterNavLinks: [
       '@/components/admin/NotificationBadges#NotificationBadges',
+      '@/components/admin/MarkOrderAsReadOnView#MarkOrderAsReadOnView',
     ],
     },
     user: Users.slug,

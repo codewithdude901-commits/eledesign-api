@@ -101,6 +101,12 @@ export const CheckoutPage: React.FC = () => {
   const locale = params.locale === 'de' ? 'de' : 'en'
   const t = i18n[locale]
 
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.cookie = `locale=${locale}; path=/; SameSite=Lax`
+    }
+  }, [locale])
+
   /**
    * State to manage the email input for guest checkout.
    */
@@ -148,6 +154,8 @@ export const CheckoutPage: React.FC = () => {
         const paymentData = (await initiatePayment(paymentID, {
           additionalData: {
             ...(email ? { customerEmail: email } : {}),
+            locale,
+
             billingAddress,
             shippingAddress: billingAddressSameAsShipping ? billingAddress : shippingAddress,
           },
@@ -424,6 +432,7 @@ export const CheckoutPage: React.FC = () => {
                   <Button
                     variant="outline"
                     className="self-start rounded-none min-w-40"
+                    disabled={isProcessingPayment}
                     onClick={() => setPaymentData(null)}
                   >
                     {t.cancelPayment}

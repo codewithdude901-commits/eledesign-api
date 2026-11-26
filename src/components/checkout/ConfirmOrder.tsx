@@ -3,99 +3,81 @@
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
-export const ConfirmOrder: React.FC = () => {
+export const ConfirmOrder: React.FC<{ locale?: string }> = ({ locale: localeProp }) => {
   const { confirmOrder } = usePayments()
-  const { cart } = useCart()
+  const { cart, clearCart } = useCart()
+
   const searchParams = useSearchParams()
   const router = useRouter()
+  const locale = localeProp || 'de'
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.cookie = `locale=${locale}; path=/; SameSite=Lax`
+    }
+  }, [locale])
 
   const isConfirming = useRef(false)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!cart || !cart.items || cart.items.length === 0) return
 
     const paymentIntentID = searchParams.get('payment_intent')
     const email = searchParams.get('email')
-    const redirectStatus = searchParams.get('redirect_status')
 
-    if (!paymentIntentID || !email) return
+    if (paymentIntentID) {
+      if (!isConfirming.current) {
+        isConfirming.current = true
 
-    if (redirectStatus !== 'succeeded') {
-      setError('Payment was not successful. Please contact support if money was deducted.')
-      return
-    }
-
-    if (isConfirming.current) return
-
-    isConfirming.current = true
-
-    const confirm = async () => {
-      try {
-        const result = await confirmOrder('stripe', {
+        confirmOrder('stripe', {
           additionalData: {
             paymentIntentID,
-            customerEmail: email,
+            ...(email ? { customerEmail: email } : {}),
+            locale,
+
           },
         })
+          .then((result) => {
+            if (result && typeof result === 'object' && 'orderID' in result && result.orderID) {
+              const accessToken =
+                'accessToken' in result ? (result.accessToken as string) : ''
+              const queryParams = new URLSearchParams()
 
-        if (
-          result &&
-          typeof result === 'object' &&
-          'orderID' in result &&
-          result.orderID
-        ) {
-          const accessToken =
-            'accessToken' in result
-              ? (result.accessToken as string)
-              : ''
+              if (email) {
+                queryParams.set('email', email)
+              }
+              if (accessToken) {
+                queryParams.set('accessToken', accessToken)
+              }
 
-          const queryParams = new URLSearchParams()
-
-          queryParams.set('email', email)
-
-          if (accessToken) {
-            queryParams.set('accessToken', accessToken)
-          }
-
-          router.push(
-            `/orders/${result.orderID}?${queryParams.toString()}`,
-          )
-        } else {
-          setError('We could not confirm your order. Please contact support.')
-          isConfirming.current = false
-        }
-      } catch (err) {
-        console.error('Order confirmation failed:', err)
-
-        setError(
-          'There was a problem confirming your order. Please contact support.',
-        )
-
-        isConfirming.current = false
+              const queryString = queryParams.toString()
+              const prefix = locale === 'en' ? 'en/' : ''
+              clearCart()
+              router.push(
+                `/${prefix}orders/${result.orderID}${queryString ? `?${queryString}` : ''}`,
+              )
+            } else {
+              isConfirming.current = false
+            }
+          })
+          .catch((err) => {
+            console.error('Order confirmation failed:', err)
+            isConfirming.current = false
+          })
       }
+    } else {
+      const prefix = locale === 'en' ? 'en/' : ''
+      router.push(`/${prefix}`)
     }
-
-    void confirm()
-  }, [cart, confirmOrder, router, searchParams])
-
-  if (error) {
-    return (
-      <div className="flex min-h-[50vh] w-full flex-col items-center justify-center gap-4 text-center">
-        <p className="text-lg font-medium">{error}</p>
-        <p className="text-sm text-muted-foreground">
-          Please do not attempt another payment until the payment status
-          has been verified.
-        </p>
-      </div>
-    )
-  }
+  }, [cart, clearCart, confirmOrder, locale, router, searchParams])
 
   return (
-    <div className="flex min-h-[50vh] w-full items-center justify-center">
-      <LoadingSpinner />
+    <div className="text-center w-full flex flex-col items-center justify-start gap-4">
+      <h1 className="text-2xl">{locale === 'de' ? 'Bestellung wird bestätigt' : 'Confirming Order'}</h1>
+
+      <LoadingSpinner className="w-12 h-6" />
     </div>
   )
 }

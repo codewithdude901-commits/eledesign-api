@@ -9,12 +9,11 @@ import { useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import React, { FormEvent, useCallback, useState } from 'react'
+import React, { FormEvent, useCallback, useEffect, useState } from 'react'
 
 type Props = {
   customerEmail?: string
   billingAddress?: Partial<Address>
-  shippingAddress?: Partial<Address>
   setProcessingPayment: React.Dispatch<React.SetStateAction<boolean>>
 }
 
@@ -29,9 +28,15 @@ export const CheckoutForm: React.FC<Props> = ({
   const [isLoading, setIsLoading] = React.useState(false)
   const [termsAccepted, setTermsAccepted] = useState(false)
 
-  const router = useRouter()
   const params = useParams<{ locale: 'de' | 'en' }>()
   const locale = params?.locale || 'de'
+  const router = useRouter()
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.cookie = `locale=${locale}; path=/; SameSite=Lax`
+    }
+  }, [locale])
 
   const { clearCart } = useCart()
   const { confirmOrder } = usePayments()
@@ -52,9 +57,20 @@ export const CheckoutForm: React.FC<Props> = ({
       setIsLoading(true)
       setProcessingPayment(true)
 
+      if (!billingAddress) {
+        setError(
+          locale === 'de'
+            ? 'Bitte fügen Sie eine Rechnungsadresse hinzu.'
+            : 'Please add a billing address.',
+        )
+        setIsLoading(false)
+        setProcessingPayment(false)
+        return
+      }
+
       if (stripe && elements) {
         try {
-          const returnUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/checkout/confirm-order${customerEmail ? `?email=${customerEmail}` : ''}`
+          const returnUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/${locale === 'en' ? 'en/' : ''}checkout/confirm-order${customerEmail ? `?email=${customerEmail}` : ''}`
 
           const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
             confirmParams: {
@@ -84,6 +100,8 @@ export const CheckoutForm: React.FC<Props> = ({
                 additionalData: {
                   paymentIntentID: paymentIntent.id,
                   ...(customerEmail ? { customerEmail } : {}),
+                  locale,
+
                 },
               })
 
@@ -105,20 +123,22 @@ export const CheckoutForm: React.FC<Props> = ({
                 }
 
                 const queryString = queryParams.toString()
-                const redirectUrl = `/orders/${confirmResult.orderID}${queryString ? `?${queryString}` : ''}`
+                const redirectUrl = `/${locale === 'en' ? 'en/' : ''}orders/${confirmResult.orderID}${queryString ? `?${queryString}` : ''}`
 
-                clearCart()
+                await clearCart()
                 router.push(redirectUrl)
               }
             } catch (err) {
               const msg = err instanceof Error ? err.message : 'Something went wrong.'
               setError(`Error while confirming order: ${msg}`)
               setIsLoading(false)
+              setProcessingPayment(false)
             }
           }
           if (stripeError?.message) {
             setError(stripeError.message)
             setIsLoading(false)
+            setProcessingPayment(false)
           }
         } catch (err) {
           const msg = err instanceof Error ? err.message : 'Something went wrong.'

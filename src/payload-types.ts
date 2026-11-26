@@ -343,7 +343,12 @@ export interface Order {
     footerText?: string | null;
   };
   inventoryRestored?: boolean | null;
+  locale?: ('de' | 'en') | null;
   accessToken?: string | null;
+  /**
+   * Timestamp when this order was first viewed by an admin
+   */
+  readAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2312,7 +2317,9 @@ export interface OrdersSelect<T extends boolean = true> {
         footerText?: T;
       };
   inventoryRestored?: T;
+  locale?: T;
   accessToken?: T;
+  readAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

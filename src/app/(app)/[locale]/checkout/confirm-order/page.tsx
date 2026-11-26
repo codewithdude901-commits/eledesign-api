@@ -6,17 +6,20 @@ import { ConfirmOrder } from '@/components/checkout/ConfirmOrder'
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 
 export default async function ConfirmOrderPage({
+  params,
   searchParams: searchParamsPromise,
 }: {
+  params: Promise<{ locale: string }>
   searchParams: SearchParams
 }) {
+  const { locale } = await params
   const searchParams = await searchParamsPromise
 
   const paymentIntent = searchParams.paymentId
 
   return (
     <div className="container min-h-[90vh] flex py-12">
-      <ConfirmOrder />
+      <ConfirmOrder locale={locale} />
     </div>
   )
 }

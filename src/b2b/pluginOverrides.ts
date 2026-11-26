@@ -11,8 +11,10 @@ import {
 } from '@/b2b/collections/fieldHelpers'
 import { setB2BOrderStatus, syncB2BOrderAfterChange } from '@/b2b/hooks/orderHooks'
 import { setB2BCartPricing } from '@/b2b/hooks/setB2BCartPricing'
+import { populateOrderCustomerEmail } from '@/hooks/populateOrderCustomerEmail'
 import { populateOrderProductNames } from '@/hooks/populateOrderProductNames'
 import { sendB2COrderConfirmationAfterChange } from '@/b2c/hooks/orderHooks'
+import { ReadStatusCell } from '@/components/admin/ReadStatusCell'
 
 const productNameField: Field = {
   name: 'product_name',
@@ -179,7 +181,7 @@ export const b2bOrdersCollectionOverride: CollectionOverride = ({ defaultCollect
     ...defaultCollection,
     admin: {
       ...defaultCollection.admin,
-      defaultColumns: ['createdAt', 'customer', 'channel', 'b2bStatus', 'amount', 'status'],
+      defaultColumns: ['createdAt', 'customer', 'channel', 'b2bStatus', 'amount', 'status', 'readAt'],
     },
     fields: [
       ...injectArrayFields(baseFields, 'items', [productNameField, ...orderItemPriceFields]),
@@ -290,7 +292,21 @@ export const b2bOrdersCollectionOverride: CollectionOverride = ({ defaultCollect
         },
       },
       {
+        name: 'locale',
+        type: 'select',
+        defaultValue: 'de',
+        options: [
+          { label: 'German', value: 'de' },
+          { label: 'English', value: 'en' },
+        ],
+        admin: { position: 'sidebar', readOnly: true },
+      },
+      {
         name: 'accessToken',
+        type: 'text',
+        unique: true,
+        index: true,
+
         type: 'text',
         unique: true,
         index: true,
@@ -310,6 +326,25 @@ export const b2bOrdersCollectionOverride: CollectionOverride = ({ defaultCollect
           ],
         },
       },
+      {
+        name: 'readAt',
+        type: 'date',
+        index: true,
+        label: 'Read status',
+        access: {
+          create: adminOnlyFieldAccess,
+          read: () => true,
+          update: adminOnlyFieldAccess,
+        },
+        admin: {
+          position: 'sidebar',
+          readOnly: true,
+          description: 'Timestamp when this order was first viewed by an admin',
+          components: {
+            Cell: ReadStatusCell,
+          },
+        },
+      },
     ],
     hooks: {
       ...defaultCollection.hooks,
@@ -317,6 +352,7 @@ export const b2bOrdersCollectionOverride: CollectionOverride = ({ defaultCollect
       beforeChange: [
         ...(defaultCollection.hooks?.beforeChange || []),
         populateOrderProductNames,
+        populateOrderCustomerEmail,
         setB2BOrderStatus,
       ],
     },
